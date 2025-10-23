@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  font-family: var(--pf-v5-global--FontFamily--sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: var(--pf-v5-global--FontFamily--monospace);
+}
+
+/* Ensure PatternFly Page component fills viewport */
+.pf-v5-c-page {
+  min-height: 100vh;
+}
