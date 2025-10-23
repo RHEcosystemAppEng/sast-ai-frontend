@@ -16,6 +16,7 @@ import { useDashboard } from '../context/DashboardContext';
 import SummaryCards from './SummaryCards';
 import JobsTable from './JobsTable';
 import BatchesTable from './BatchesTable';
+import OshScansTable from './OshScansTable';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string | number>('jobs');
@@ -106,6 +107,15 @@ const Dashboard: React.FC = () => {
           >
             <div style={{ paddingTop: '1rem' }}>
               <BatchesTable />
+            </div>
+          </Tab>
+          <Tab 
+            eventKey="osh" 
+            title={<TabTitleText>OSH Scans</TabTitleText>}
+            aria-label="OSH Scans tab"
+          >
+            <div style={{ paddingTop: '1rem' }}>
+              <OshScansTable />
             </div>
           </Tab>
         </Tabs>

@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import orchestratorApi from '../services/orchestratorApi';
-import { Job, JobBatch, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES } from '../types';
 import { config } from '../config';
 
 interface DashboardContextType {
   jobs: Job[];
   batches: JobBatch[];
+  oshScans: OshScanWithJob[];
   summary: DashboardSummary | null;
   isWebSocketConnected: boolean;
   loading: boolean;
@@ -19,6 +20,7 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [batches, setBatches] = useState<JobBatch[]>([]);
+  const [oshScans, setOshScans] = useState<OshScanWithJob[]>([]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,14 +29,16 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     setError(null);
     try {
-      const [jobsData, batchesData, summaryData] = await Promise.all([
+      const [jobsData, batchesData, oshScansData, summaryData] = await Promise.all([
         orchestratorApi.getJobs({ size: 50 }),
         orchestratorApi.getBatches({ size: 50 }),
+        orchestratorApi.getOshScans({ size: 50 }),
         orchestratorApi.getDashboardSummary()
       ]);
       
       setJobs(jobsData);
       setBatches(batchesData);
+      setOshScans(oshScansData);
       setSummary(summaryData);
     } catch (err) {
       console.error('Failed to fetch initial data:', err);
@@ -113,7 +117,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <DashboardContext.Provider 
       value={{ 
         jobs, 
-        batches, 
+        batches,
+        oshScans, 
         summary, 
         isWebSocketConnected,
         loading,

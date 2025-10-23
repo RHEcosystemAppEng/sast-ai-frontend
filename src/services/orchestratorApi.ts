@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Job, JobBatch, DashboardSummary } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary } from '../types';
 import { config } from '../config';
 
 class OrchestratorApi {
@@ -43,6 +43,16 @@ class OrchestratorApi {
     } catch (error) {
       console.error('OSH status endpoint not available:', error);
       return null;
+    }
+  }
+
+  async getOshScans(params?: { page?: number; size?: number; status?: 'COLLECTED' | 'UNCOLLECTED' }): Promise<OshScanWithJob[]> {
+    try {
+      const response = await this.client.get<OshScanWithJob[]>('/admin/osh/scans/all', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch OSH scans:', error);
+      return [];
     }
   }
 
