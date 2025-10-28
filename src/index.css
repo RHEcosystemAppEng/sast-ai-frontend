@@ -1,8 +1,9 @@
 body {
   margin: 0;
-  font-family: var(--pf-v5-global--FontFamily--sans-serif);
+  font-family: var(--pf-v5-global--FontFamily--heading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--pf-v5-global--BackgroundColor--100);
 }
 
 code {
@@ -12,4 +13,25 @@ code {
 /* Ensure PatternFly Page component fills viewport */
 .pf-v5-c-page {
   min-height: 100vh;
+}
+
+/* OpenShift Console-like styling for navigation */
+.pf-v5-c-nav__link.pf-m-current {
+  color: var(--pf-v5-global--active-color--100);
+  font-weight: var(--pf-v5-global--FontWeight--bold);
+}
+
+/* Ensure masthead has proper background */
+.pf-v5-c-masthead {
+  background-color: var(--pf-v5-global--BackgroundColor--dark-100);
+}
+
+/* Style for tables */
+.pf-v5-c-table {
+  --pf-v5-c-table--BackgroundColor: var(--pf-v5-global--BackgroundColor--100);
+}
+
+/* Consistent spacing for page sections */
+.pf-v5-c-page__main-section {
+  background-color: var(--pf-v5-global--BackgroundColor--100);
 }

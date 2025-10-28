@@ -27,7 +27,7 @@ const SummaryCards: React.FC = () => {
         <CardBody>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div>Total: <Label color="blue">{summary.totalJobs}</Label></div>
-            <div>Running: <Label color="teal">{summary.runningJobs}</Label></div>
+            <div>Running: <Label color="cyan">{summary.runningJobs}</Label></div>
             <div>Pending: <Label color="grey">{summary.pendingJobs}</Label></div>
             <div>Completed: <Label color="green">{summary.completedJobs}</Label></div>
             <div>Failed: <Label color="red">{summary.failedJobs}</Label></div>
@@ -41,7 +41,7 @@ const SummaryCards: React.FC = () => {
         <CardBody>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div>Total: <Label color="blue">{summary.totalBatches}</Label></div>
-            <div>Processing: <Label color="teal">{summary.processingBatches}</Label></div>
+            <div>Processing: <Label color="cyan">{summary.processingBatches}</Label></div>
             <div>Completed: <Label color="green">{summary.completedBatches}</Label></div>
           </div>
         </CardBody>

@@ -42,7 +42,7 @@ const BatchesTable: React.FC = () => {
     <>
       <Toolbar>
         <ToolbarContent>
-          <ToolbarItem align={{ default: 'alignEnd' }}>
+          <ToolbarItem align={{ default: 'alignRight' }}>
             <Pagination
               itemCount={batches.length}
               page={page}

@@ -54,7 +54,7 @@ const JobsTable: React.FC = () => {
               onClear={() => setFilter('')}
             />
           </ToolbarItem>
-          <ToolbarItem align={{ default: 'alignEnd' }}>
+          <ToolbarItem align={{ default: 'alignRight' }}>
             <Pagination
               itemCount={filteredJobs.length}
               page={page}

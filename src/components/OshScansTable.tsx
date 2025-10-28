@@ -49,7 +49,7 @@ const OshScansTable: React.FC = () => {
               onClear={() => setFilter('')}
             />
           </ToolbarItem>
-          <ToolbarItem align={{ default: 'alignEnd' }}>
+          <ToolbarItem align={{ default: 'alignRight' }}>
             <Pagination
               itemCount={filteredScans.length}
               page={page}

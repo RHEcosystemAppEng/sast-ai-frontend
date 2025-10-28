@@ -1,13 +1,13 @@
 import { JobStatus, BatchStatus } from '../types';
 
-export function getJobStatusColor(status: JobStatus): 'green' | 'blue' | 'teal' | 'red' | 'orange' | 'grey' {
+export function getJobStatusColor(status: JobStatus): 'green' | 'blue' | 'cyan' | 'red' | 'orange' | 'grey' {
   switch (status) {
     case 'COMPLETED':
       return 'green';
     case 'RUNNING':
       return 'blue';
     case 'SCHEDULED':
-      return 'teal';
+      return 'cyan';
     case 'FAILED':
       return 'red';
     case 'CANCELLED':
