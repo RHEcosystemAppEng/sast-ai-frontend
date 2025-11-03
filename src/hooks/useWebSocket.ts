@@ -15,20 +15,33 @@ export function useWebSocket({
   maxReconnectAttempts = 10
 }: UseWebSocketOptions) {
   const [isConnected, setIsConnected] = useState(false);
-  const [reconnectCount, setReconnectCount] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const pingIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const reconnectCountRef = useRef(0);
+  const isConnectingRef = useRef(false);
 
   const connect = useCallback(() => {
+    if (isConnectingRef.current) {
+      console.log('Connection attempt already in progress, skipping');
+      return;
+    }
+
+    if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
+      wsRef.current.close();
+    }
+
+    isConnectingRef.current = true;
+
     try {
       const ws = new WebSocket(url);
-      
+
       ws.onopen = () => {
         console.log('WebSocket connected');
         setIsConnected(true);
-        setReconnectCount(0);
-        
+        reconnectCountRef.current = 0;
+        isConnectingRef.current = false;
+
         // Start ping/pong keepalive (every 30 seconds)
         pingIntervalRef.current = setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
@@ -51,23 +64,25 @@ export function useWebSocket({
 
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
+        isConnectingRef.current = false;
       };
 
       ws.onclose = () => {
         console.log('WebSocket disconnected');
         setIsConnected(false);
-        
+        isConnectingRef.current = false;
+
         if (pingIntervalRef.current) {
           clearInterval(pingIntervalRef.current);
         }
 
         // Attempt reconnection with exponential backoff
-        if (reconnectCount < maxReconnectAttempts) {
-          const delay = Math.min(reconnectInterval * Math.pow(2, reconnectCount), 30000);
-          console.log(`Reconnecting in ${delay}ms (attempt ${reconnectCount + 1}/${maxReconnectAttempts})`);
-          
+        if (reconnectCountRef.current < maxReconnectAttempts) {
+          const delay = Math.min(reconnectInterval * Math.pow(2, reconnectCountRef.current), 30000);
+          console.log(`Reconnecting in ${delay}ms (attempt ${reconnectCountRef.current + 1}/${maxReconnectAttempts})`);
+
           reconnectTimeoutRef.current = setTimeout(() => {
-            setReconnectCount(prev => prev + 1);
+            reconnectCountRef.current += 1;
             connect();
           }, delay);
         } else {
@@ -78,8 +93,9 @@ export function useWebSocket({
       wsRef.current = ws;
     } catch (error) {
       console.error('Failed to create WebSocket:', error);
+      isConnectingRef.current = false;
     }
-  }, [url, onMessage, reconnectCount, maxReconnectAttempts, reconnectInterval]);
+  }, [url, onMessage, maxReconnectAttempts, reconnectInterval]);
 
   useEffect(() => {
     connect();
