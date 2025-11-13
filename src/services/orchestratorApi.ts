@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Job, JobBatch, OshScanWithJob, DashboardSummary } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary, JobActivityDataPoint } from '../types';
 import { config } from '../config';
 
 class OrchestratorApi {
@@ -89,6 +89,16 @@ class OrchestratorApi {
   async getHealth(): Promise<any> {
     const response = await this.client.get('/health');
     return response.data;
+  }
+
+  // Job Activity - 24 hour statistics
+  async getJobActivity24h(): Promise<JobActivityDataPoint[]> {
+    try {
+      const response = await this.client.get<JobActivityDataPoint[]>('/jobs/activity/24h');
+      return response.data;
+    } catch (error) {
+      return [];
+    }
   }
 }
 

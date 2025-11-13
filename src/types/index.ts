@@ -62,6 +62,14 @@ export interface DashboardSummary {
   uncollectedOshScans: number;
 }
 
+export interface JobActivityDataPoint {
+  timestamp: string;
+  running: number;
+  pending: number;
+  completed: number;
+  failed: number;
+}
+
 export const WS_MESSAGE_TYPES = {
   CONNECTED: 'connected',
   PONG: 'pong',

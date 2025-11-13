@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import orchestratorApi from '../services/orchestratorApi';
-import { Job, JobBatch, OshScanWithJob, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES, JobActivityDataPoint } from '../types';
 import { config } from '../config';
 
 interface DashboardContextType {
@@ -9,6 +9,7 @@ interface DashboardContextType {
   batches: JobBatch[];
   oshScans: OshScanWithJob[];
   summary: DashboardSummary | null;
+  jobActivity: JobActivityDataPoint[];
   isWebSocketConnected: boolean;
   loading: boolean;
   error: string | null;
@@ -22,6 +23,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [batches, setBatches] = useState<JobBatch[]>([]);
   const [oshScans, setOshScans] = useState<OshScanWithJob[]>([]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [jobActivity, setJobActivity] = useState<JobActivityDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,17 +31,19 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     setError(null);
     try {
-      const [jobsData, batchesData, oshScansData, summaryData] = await Promise.all([
+      const [jobsData, batchesData, oshScansData, summaryData, activityData] = await Promise.all([
         orchestratorApi.getJobs({ size: 50 }),
         orchestratorApi.getBatches({ size: 50 }),
         orchestratorApi.getOshScans({ size: 50 }),
-        orchestratorApi.getDashboardSummary()
+        orchestratorApi.getDashboardSummary(),
+        orchestratorApi.getJobActivity24h()
       ]);
-      
+
       setJobs(jobsData);
       setBatches(batchesData);
       setOshScans(oshScansData);
       setSummary(summaryData);
+      setJobActivity(activityData);
     } catch (err) {
       console.error('Failed to fetch initial data:', err);
       setError('Failed to load dashboard data. Please check if the orchestrator is running.');
@@ -114,16 +118,17 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   return (
-    <DashboardContext.Provider 
-      value={{ 
-        jobs, 
+    <DashboardContext.Provider
+      value={{
+        jobs,
         batches,
-        oshScans, 
-        summary, 
+        oshScans,
+        summary,
+        jobActivity,
         isWebSocketConnected,
         loading,
         error,
-        refetchAll: fetchInitialData 
+        refetchAll: fetchInitialData
       }}
     >
       {children}

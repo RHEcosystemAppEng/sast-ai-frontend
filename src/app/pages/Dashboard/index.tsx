@@ -13,6 +13,7 @@ import {
 import { ConnectedIcon, DisconnectedIcon, SyncIcon } from '@patternfly/react-icons';
 import { useDashboard } from '../../../context/DashboardContext';
 import SummaryCards from '../../../components/SummaryCards';
+import JobActivityGraph from '../../../components/JobActivityGraph';
 import JobsTable from '../../../components/JobsTable';
 import BatchesTable from '../../../components/BatchesTable';
 import OshScansTable from '../../../components/OshScansTable';
@@ -81,6 +82,10 @@ const DashboardPage: React.FC = () => {
 
       <PageSection>
         <SummaryCards />
+      </PageSection>
+
+      <PageSection>
+        <JobActivityGraph />
       </PageSection>
 
       <PageSection>
