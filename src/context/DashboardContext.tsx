@@ -32,9 +32,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const [jobsData, batchesData, oshScansData, summaryData, activityData] = await Promise.all([
-        orchestratorApi.getJobs({ size: 50 }),
-        orchestratorApi.getBatches({ size: 50 }),
-        orchestratorApi.getOshScans({ size: 50 }),
+        orchestratorApi.getJobs({ size: 200 }),
+        orchestratorApi.getBatches({ size: 200 }),
+        orchestratorApi.getOshScans({ size: 200 }),
         orchestratorApi.getDashboardSummary(),
         orchestratorApi.getJobActivity24h()
       ]);
