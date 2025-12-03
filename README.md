@@ -13,7 +13,7 @@ Real-time monitoring dashboard for SAST AI Orchestrator with WebSocket updates.
 # Install dependencies
 npm install
 
-# Create environment configuration
+# Create environment configuration (local/OCP endpoints)
 cat > .env << 'EOF'
 REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
 REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
