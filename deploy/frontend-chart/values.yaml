@@ -14,8 +14,8 @@ app:
   port: 8080
 
   env:
-    REACT_APP_ORCHESTRATOR_API_URL: "http://sast-ai-orchestrator-dev.sast-ai-dev.svc.cluster.local/api/v1"
-    REACT_APP_WS_URL: "ws://sast-ai-orchestrator-dev.sast-ai-dev.svc.cluster.local/ws/dashboard"
+    REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-dev.apps.appeng.clusters.se-apps.redhat.com/api/v1"
+    REACT_APP_WS_URL: "wss://sast-ai-orchestrator-sast-ai-dev.apps.appeng.clusters.se-apps.redhat.com/ws/dashboard"
 
   resources:
     limits:
