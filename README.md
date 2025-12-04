@@ -14,6 +14,32 @@ Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHE
 - **oc** or **kubectl** CLI (for cluster access)
 - Access to container registry (Quay.io for CI/CD)
 
+## Screenshots
+
+### Dashboard Overview
+![Dashboard Overview](docs/screenshots/dashboard-overview.png)
+
+The dashboard provides a comprehensive view with:
+- **Summary Cards**: Real-time statistics for Jobs, Batches, and OSH Scans
+- **Job Activity Graph**: 24-hour timeline showing job status trends (Running, Pending, Completed, Failed)
+
+### Jobs Table
+![Jobs Table](docs/screenshots/jobs-table-view.png)
+
+The Jobs view features:
+- **Filterable table** with job details (ID, package, status, timestamps)
+- **Status indicators** with color-coding (Running, Completed, Failed, etc.)
+- **Actions column** with links to Tekton pipelines
+- **Pagination** for large datasets
+
+### OSH Scans Table
+![OSH Scans Table](docs/screenshots/osh-scans-table.png)
+
+The OSH Scans view displays:
+- **Scan details** including hash IDs, accounts, etc.
+- **Status tracking** (Collected/Uncollected)
+- **Processing timestamps**
+
 ## Quick Start
 
 ```bash
@@ -296,14 +322,14 @@ The dashboard handles these message types:
    npm start
    ```
 
-3. **Verify UI Components**:
+3. **Verify UI Components** (see [Screenshots](#screenshots) section for visual reference):
    - Dashboard loads at http://localhost:3000
    - Connection indicator shows "Live" (green)
-   - Summary cards display metrics
-   - Jobs table shows data
+   - Summary cards display metrics ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
+   - Jobs table shows data ([Jobs Table](docs/screenshots/jobs-table-view.png))
    - Batches table shows data
-   - OSH Scans tab displays scan data
-   - Job Activity Graph shows 24-hour activity chart
+   - OSH Scans tab displays scan data ([OSH Scans Table](docs/screenshots/osh-scans-table.png))
+   - Job Activity Graph shows 24-hour activity chart ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
 
 4. **Test WebSocket**:
    - Open DevTools Console
