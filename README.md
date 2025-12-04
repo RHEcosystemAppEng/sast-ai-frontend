@@ -1,5 +1,8 @@
 # SAST AI Monitoring Dashboard
 
+[![Build and Push Image](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml/badge.svg)](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml)
+[![Container Image](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend/status)](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend)
+
 Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator) with WebSocket updates.
 
 ## Prerequisites
