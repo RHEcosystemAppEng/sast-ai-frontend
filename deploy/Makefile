@@ -2,7 +2,7 @@
 
 # Configuration
 KUBECTL_CMD := $(shell command -v oc 2>/dev/null || echo kubectl)
-NAMESPACE := sast-ai-dev
+NAMESPACE ?= $(shell oc config view --minify --output 'jsonpath={..namespace}')
 RELEASE_NAME := sast-ai-frontend
 CHART_PATH := ./frontend-chart
 
