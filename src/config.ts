@@ -4,10 +4,22 @@ interface Config {
   isDevelopment: boolean;
 }
 
+// Extend Window interface to include _env_
+declare global {
+  interface Window {
+    _env_?: {
+      REACT_APP_ORCHESTRATOR_API_URL?: string;
+      REACT_APP_WS_URL?: string;
+    };
+  }
+}
+
 function validateConfig(): Config {
-  const apiUrl = process.env.REACT_APP_ORCHESTRATOR_API_URL;
-  const wsUrl = process.env.REACT_APP_WS_URL;
-  
+  // Try window._env_ first (runtime config from Kubernetes ConfigMap)
+  // Fall back to process.env (build-time config)
+  const apiUrl = window._env_?.REACT_APP_ORCHESTRATOR_API_URL || process.env.REACT_APP_ORCHESTRATOR_API_URL;
+  const wsUrl = window._env_?.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL;
+
   const defaultApiUrl = 'http://localhost:8080/api/v1';
   const defaultWsUrl = 'ws://localhost:8080/ws/dashboard';
 

@@ -1,11 +1,47 @@
 # SAST AI Monitoring Dashboard
 
-Real-time monitoring dashboard for SAST AI Orchestrator with WebSocket updates.
+[![Build and Push Image](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml/badge.svg)](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml)
+[![Container Image](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend/status)](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend)
+
+Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator) with WebSocket updates.
 
 ## Prerequisites
 
+### For Local Development
 - **Node.js 18+** and npm
 - **SAST AI Orchestrator** running (default: http://localhost:8080)
+
+### For Deployment
+- **Docker** (for containerized deployment)
+- **Helm 3** (for Kubernetes/OpenShift deployment)
+- **oc** or **kubectl** CLI (for cluster access)
+- Access to container registry (Quay.io for CI/CD)
+
+## Screenshots
+
+### Dashboard Overview
+![Dashboard Overview](docs/screenshots/dashboard-overview.png)
+
+The dashboard provides a comprehensive view with:
+- **Summary Cards**: Real-time statistics for Jobs, Batches, and OSH Scans
+- **Job Activity Graph**: 24-hour timeline showing job status trends (Running, Pending, Completed, Failed)
+
+### Jobs Table
+![Jobs Table](docs/screenshots/jobs-table-view.png)
+
+The Jobs view features:
+- **Filterable table** with job details (ID, package, status, timestamps)
+- **Status indicators** with color-coding (Running, Completed, Failed, etc.)
+- **Actions column** with links to Tekton pipelines
+- **Pagination** for large datasets
+
+### OSH Scans Table
+![OSH Scans Table](docs/screenshots/osh-scans-table.png)
+
+The OSH Scans view displays:
+- **Scan details** including hash IDs, accounts, etc.
+- **Status tracking** (Collected/Uncollected)
+- **Processing timestamps**
 
 ## Quick Start
 
@@ -13,7 +49,7 @@ Real-time monitoring dashboard for SAST AI Orchestrator with WebSocket updates.
 # Install dependencies
 npm install
 
-# Create environment configuration
+# Create environment configuration (local/OCP endpoints)
 cat > .env << 'EOF'
 REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
 REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
@@ -27,7 +63,9 @@ npm start
 
 ## Configuration
 
-### Environment Variables
+The application supports a **two-tier configuration strategy** to enable runtime configuration in containerized environments:
+
+### 1. Build-time Configuration (Local Development)
 
 Create a `.env` file in the project root:
 
@@ -39,9 +77,32 @@ REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
 REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
 ```
 
-### Production Configuration
+These values are embedded into the JavaScript bundle during `npm build`.
 
-For OpenShift deployment, create `.env.production`:
+### 2. Runtime Configuration (Kubernetes/OpenShift)
+
+In production, configuration is provided via a **Kubernetes ConfigMap** that generates `/env-config.js`:
+
+```javascript
+window._env_ = {
+  REACT_APP_ORCHESTRATOR_API_URL: 'https://orchestrator.example.com/api/v1',
+  REACT_APP_WS_URL: 'wss://orchestrator.example.com/ws/dashboard'
+};
+```
+
+**Benefits:**
+- Same Docker image works across all environments
+- No rebuild required for configuration changes
+- Update ConfigMap → Helm upgrade → Pods auto-restart
+
+**Configuration in Helm:**
+Edit `deploy/frontend-chart/values.yaml`:
+```yaml
+app:
+  env:
+    REACT_APP_ORCHESTRATOR_API_URL: "https://your-orchestrator-url/api/v1"
+    REACT_APP_WS_URL: "wss://your-orchestrator-url/ws/dashboard"
+```
 
 ## Development
 
@@ -63,10 +124,98 @@ npm run build
 
 - Opens at: **http://localhost:3000**
 - Connects to orchestrator at: **http://localhost:8080** (configurable via `.env`)
-- Hot reload enabled - changes reflect immediately
+- Hot reload enabled (changes reflect immediately)
 - DevTools console shows WebSocket messages
 
-## Build for Production
+## Deployment
+
+### Container Build & Run
+
+#### Build Container Image
+
+The project includes a multi-stage Containerfile using Red Hat UBI images:
+
+```bash
+# Build the image
+docker build -t sast-ai-frontend:latest .
+
+# Run locally
+docker run -p 8080:8080 sast-ai-frontend:latest
+
+# Access at http://localhost:8080
+```
+
+**Container Image Details:**
+- Base: Red Hat UBI 9 with Nginx
+- Non-root user (UID 1001) for OpenShift compatibility
+- Port: 8080
+- Health check: `/healthz`
+
+#### Automated CI/CD
+
+Pushes to `main` branch trigger GitHub Actions:
+1. Build Docker image using Buildx
+2. Push to `quay.io/ecosystem-appeng/sast-ai-frontend:latest`
+3. Deploy manually using Helm
+
+### OpenShift/Kubernetes Deployment
+
+#### Using Makefile (Recommended)
+
+```bash
+cd deploy
+
+# First-time deployment
+make deploy
+
+# Upgrade existing deployment
+make upgrade
+
+# Check deployment status
+make status
+
+# Get frontend URL
+make url
+
+# View pod logs
+make logs
+
+# Rollback to previous version
+make rollback
+
+# Remove deployment
+make clean
+```
+
+#### Using Helm Directly
+
+```bash
+cd deploy/frontend-chart
+
+# Install
+helm install sast-ai-frontend . -n sast-ai-dev
+
+# Upgrade
+helm upgrade sast-ai-frontend . -n sast-ai-dev
+
+# Uninstall
+helm uninstall sast-ai-frontend -n sast-ai-dev
+```
+
+#### Health Checks
+
+The deployment includes Kubernetes health probes:
+
+- **Liveness Probe**: `GET /healthz` every 10s (starts after 10s)
+- **Readiness Probe**: `GET /healthz` every 5s (starts after 5s)
+
+#### OpenShift Route Features
+
+- **TLS**: Automatic edge termination (HTTPS)
+- **WebSocket**: Supported with 1-hour timeout
+- **Hostname**: Auto-generated based on cluster domain
+
+### Build for Production
 
 ```bash
 # Create optimized production build
@@ -75,6 +224,8 @@ npm run build
 # Output directory: build/
 # Contains static HTML, CSS, JS files ready for deployment
 ```
+
+**Build artifacts are automatically included in Docker image.**
 
 ## Testing WebSocket Connection
 
@@ -87,49 +238,49 @@ WebSocket message: { type: 'job_status_change', data: {...} }
 
 ## Architecture
 
-### Component Structure
+The dashboard follows a centralized state management pattern with real-time updates:
 
+**1. Initial Load (REST API):**
 ```
-sast-ai-frontend/
-├── src/
-│   ├── components/           # React UI components
-│   │   ├── Dashboard.tsx     # Main layout with tabs & header
-│   │   ├── SummaryCards.tsx  # 3 metric cards (Jobs/Batches/OSH)
-│   │   ├── JobsTable.tsx     # Jobs table with search/pagination
-│   │   └── BatchesTable.tsx  # Batches table with progress bars
-│   ├── context/
-│   │   └── DashboardContext.tsx  # Global state + WebSocket manager
-│   ├── hooks/
-│   │   └── useWebSocket.ts   # WebSocket with auto-reconnect
-│   ├── services/
-│   │   └── orchestratorApi.ts  # REST API client (axios)
-│   ├── types/
-│   │   └── index.ts          # TypeScript interfaces (Job, Batch, etc.)
-│   ├── utils/
-│   │   └── statusHelpers.ts  # Status colors & formatting
-│   ├── App.tsx               # Root component
-│   └── index.tsx             # Entry point + PatternFly CSS import
-├── public/                   # Static assets
-├── .env                      # Local configuration (not in git)
-├── package.json              # Dependencies & scripts
-└── tsconfig.json             # TypeScript configuration
+DashboardContext → orchestratorApi.getJobs() → Update state
+DashboardContext → orchestratorApi.getBatches() → Update state
+DashboardContext → orchestratorApi.getOshScans() → Update state
+DashboardContext → orchestratorApi.getDashboardSummary() → Update state
+DashboardContext → orchestratorApi.getJobActivity24h() → Update state
 ```
 
-### Data Flow
+**Additional API Methods Available:**
+- `getJobById(jobId)` - Fetch individual job details
+- `getBatchById(batchId)` - Fetch individual batch details
+- `getOshStatus()` - Fetch OSH status
+- `getHealth()` - Health check endpoint
 
+**2. Real-time Updates (WebSocket):**
 ```
-1. Initial Load (REST API):
-   DashboardContext → orchestratorApi.getJobs() → Update state
-   DashboardContext → orchestratorApi.getBatches() → Update state
-   DashboardContext → orchestratorApi.getDashboardSummary() → Update state
+Orchestrator → ws://dashboard → DashboardContext → Update state → Components re-render
+```
 
-2. Real-time Updates (WebSocket):
-   Orchestrator → ws://dashboard → DashboardContext → Update state
-   
-3. State → Components:
-   DashboardContext.jobs → JobsTable → Render
-   DashboardContext.batches → BatchesTable → Render
-   DashboardContext.summary → SummaryCards → Render
+WebSocket includes automatic reconnection with exponential backoff (max 10 attempts) and ping/pong keepalive every 30 seconds.
+
+**3. State Management:**
+
+DashboardContext provides:
+- `jobs` - Array of job objects
+- `batches` - Array of batch objects
+- `oshScans` - Array of OSH scan objects
+- `summary` - Dashboard summary metrics
+- `jobActivity` - 24-hour job activity statistics
+- `loading` - Loading state indicator
+- `error` - Error state
+- `refetchAll()` - Manual data refresh method
+
+**4. State to UI:**
+```
+DashboardContext.jobs → JobsTable
+DashboardContext.batches → BatchesTable
+DashboardContext.oshScans → OshScansTable
+DashboardContext.summary → SummaryCards
+DashboardContext.jobActivity → JobActivityGraph (24-hour activity chart)
 ```
 
 ### WebSocket Messages
@@ -150,20 +301,20 @@ The dashboard handles these message types:
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| **React** | 19.2.0 | UI framework |
-| **TypeScript** | 5.9.3 | Type safety |
-| **PatternFly React Core** | 6.4.0 | UI components |
-| **PatternFly React Table** | 6.4.0 | Data tables |
-| **PatternFly React Icons** | 6.4.0 | Icons |
-| **PatternFly CSS** | 6.4.0 | Styling |
-| **Axios** | 1.12.2 | HTTP client |
+| **React** | 18.3.1 | UI framework |
+| **TypeScript** | 4.9.5 | Type safety |
+| **PatternFly React Core** | 5.4.14 | UI components |
+| **PatternFly React Table** | 5.4.16 | Data tables |
+| **PatternFly React Icons** | 5.4.2 | Icons |
+| **PatternFly CSS** | 5.4.2 | Styling |
+| **Recharts** | 2.12.7 | Charting library for activity graphs |
+| **React Router DOM** | 6.30.1 | Client-side routing |
+| **Axios** | 1.13.0 | HTTP client |
 | **React Scripts** | 5.0.1 | Build tooling |
 
-## Testing
+## Manual Testing
 
-### Manual Testing
-
-1. **Start orchestrator** (Phase 1):
+1. **Start orchestrator**:
    ```bash
    cd ../sast-ai-orchestrator
    ./mvnw quarkus:dev
@@ -174,47 +325,20 @@ The dashboard handles these message types:
    npm start
    ```
 
-3. **Verify**:
+3. **Verify UI Components** (see [Screenshots](#screenshots) section for visual reference):
    - Dashboard loads at http://localhost:3000
    - Connection indicator shows "Live" (green)
-   - Summary cards display metrics
-   - Jobs table shows data
+   - Summary cards display metrics ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
+   - Jobs table shows data ([Jobs Table](docs/screenshots/jobs-table-view.png))
    - Batches table shows data
+   - OSH Scans tab displays scan data ([OSH Scans Table](docs/screenshots/osh-scans-table.png))
+   - Job Activity Graph shows 24-hour activity chart ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
 
 4. **Test WebSocket**:
    - Open DevTools Console
    - Look for: `WebSocket connected`
    - Trigger job status change in orchestrator
-   - Watch table update in real-time
-
-### WebSocket Testing with wscat
-
-```bash
-# Install wscat globally
-npm install -g wscat
-
-# Test WebSocket endpoint
-wscat -c ws://localhost:8080/ws/dashboard
-
-# You should see:
-Connected (press CTRL+C to quit)
-< {"type":"connected","data":{"sessionId":"...","timestamp":...}}
-
-# Send ping
-> ping
-
-# Should receive:
-< {"type":"pong","data":{"timestamp":...}}
-```
-
-## Browser Support
-
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-
-WebSocket and modern ES6+ features required.
+   - Watch tables update in real-time
 
 ## Links
 
