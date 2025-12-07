@@ -14,8 +14,8 @@ app:
   port: 8080
 
   env:
-    REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/api/v1"
-    REACT_APP_WS_URL: "wss://sast-ai-orchestrator-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/ws/dashboard"
+    REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-dev.apps.appeng.clusters.se-apps.redhat.com/api/v1"
+    REACT_APP_WS_URL: "wss://sast-ai-orchestrator-sast-ai-dev.apps.appeng.clusters.se-apps.redhat.com/ws/dashboard"
 
   resources:
     limits:
@@ -44,7 +44,7 @@ route:
   annotations:
     haproxy.router.openshift.io/timeout: 1h
 
-namespace: sast-ai-prod
+namespace: sast-ai-dev
 
 # Cluster configuration
 clusterDomain: appeng.clusters.se-apps.redhat.com
