@@ -1,0 +1,17 @@
+{{- if .Values.consoleLink.enabled }}
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: {{ include "frontend.fullname" . }}-{{ .Values.namespace }}-dashboard
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+spec:
+  location: NamespaceDashboard
+  namespaceDashboard:
+    namespaces:
+      {{- range .Values.consoleLink.namespaces }}
+      - {{ . }}
+      {{- end }}
+  text: {{ .Values.consoleLink.text | quote }}
+  href: {{ printf "https://%s" (include "frontend.route.host" .) }}
+{{- end }}

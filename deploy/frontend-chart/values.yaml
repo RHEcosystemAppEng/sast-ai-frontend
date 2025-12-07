@@ -45,3 +45,15 @@ route:
     haproxy.router.openshift.io/timeout: 1h
 
 namespace: sast-ai-dev
+
+# Cluster configuration
+clusterDomain: appeng.clusters.se-apps.redhat.com
+
+# OpenShift Console Integration
+consoleLink:
+  enabled: true
+  text: "SAST AI Monitoring Dashboard"
+  # List of namespaces where the dashboard link should appear
+  namespaces:
+    - sast-ai-dev
+    - sast-ai-prod
