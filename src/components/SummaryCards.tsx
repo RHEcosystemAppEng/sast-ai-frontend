@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Gallery,
   Card,
   CardTitle,
   CardBody,
@@ -21,8 +20,13 @@ const SummaryCards: React.FC = () => {
   }
 
   return (
-    <Gallery hasGutter minWidths={{ default: '250px' }}>
-      <Card>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '24px',
+      width: '100%'
+    }}>
+      <Card style={{ flex: '0 1 320px' }}>
         <CardTitle>Jobs</CardTitle>
         <CardBody>
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center' }}>
@@ -42,7 +46,7 @@ const SummaryCards: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card>
+      <Card style={{ flex: '0 1 320px' }}>
         <CardTitle>Batches</CardTitle>
         <CardBody>
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center' }}>
@@ -56,7 +60,7 @@ const SummaryCards: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card>
+      <Card style={{ flex: '0 1 320px' }}>
         <CardTitle>OSH Scans</CardTitle>
         <CardBody>
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center' }}>
@@ -69,7 +73,7 @@ const SummaryCards: React.FC = () => {
           </div>
         </CardBody>
       </Card>
-    </Gallery>
+    </div>
   );
 };
 
