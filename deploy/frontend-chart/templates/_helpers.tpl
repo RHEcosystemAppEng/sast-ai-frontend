@@ -49,3 +49,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "frontend.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Generate the route hostname for the frontend
+*/}}
+{{- define "frontend.route.host" -}}
+{{- if .Values.route.host -}}
+{{- .Values.route.host -}}
+{{- else -}}
+{{- printf "%s-%s.apps.%s" (include "frontend.fullname" .) .Values.namespace .Values.clusterDomain -}}
+{{- end -}}
+{{- end }}
