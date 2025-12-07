@@ -12,7 +12,7 @@ Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHE
 - **SAST AI Orchestrator** running (default: http://localhost:8080)
 
 ### For Deployment
-- **Docker** (for containerized deployment)
+- **Podman/Docker** (for containerized deployment)
 - **Helm 3** (for Kubernetes/OpenShift deployment)
 - **oc** or **kubectl** CLI (for cluster access)
 - Access to container registry (Quay.io for CI/CD)
