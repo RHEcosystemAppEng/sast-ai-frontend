@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardTitle,
   CardBody,
-  Spinner
+  Spinner,
+  MenuToggle,
+  Select,
+  SelectList,
+  SelectOption
 } from '@patternfly/react-core';
 import {
   AreaChart,
@@ -16,14 +20,49 @@ import {
   Legend
 } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
+import { TIME_PERIOD_OPTIONS, getTimePeriodLabel } from '../types';
 
 const JobActivityGraph: React.FC = () => {
-  const { jobActivity, loading } = useDashboard();
+  const { jobActivity, loading, timePeriod, setTimePeriod } = useDashboard();
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
+
+  const onSelectTimePeriod = (_event: any, value: string | number | undefined) => {
+    if (value && typeof value === 'string') {
+      setTimePeriod(value as any);
+      setIsSelectOpen(false);
+    }
+  };
+
+  const cardTitle = (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <span>Job Activity - {getTimePeriodLabel(timePeriod)}</span>
+      <Select
+        id="time-period-select"
+        isOpen={isSelectOpen}
+        selected={timePeriod}
+        onSelect={onSelectTimePeriod}
+        onOpenChange={(isOpen) => setIsSelectOpen(isOpen)}
+        toggle={(toggleRef) => (
+          <MenuToggle ref={toggleRef} onClick={() => setIsSelectOpen(!isSelectOpen)} isExpanded={isSelectOpen}>
+            {getTimePeriodLabel(timePeriod)}
+          </MenuToggle>
+        )}
+      >
+        <SelectList>
+          {TIME_PERIOD_OPTIONS.map((option) => (
+            <SelectOption key={option.value} value={option.value}>
+              {option.label}
+            </SelectOption>
+          ))}
+        </SelectList>
+      </Select>
+    </div>
+  );
 
   if (loading) {
     return (
       <Card>
-        <CardTitle>Job Activity - Last 24 Hours</CardTitle>
+        <CardTitle>{cardTitle}</CardTitle>
         <CardBody>
           <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', height: '300px', alignItems: 'center' }}>
             <Spinner size="xl" />
@@ -36,7 +75,7 @@ const JobActivityGraph: React.FC = () => {
   if (!jobActivity || jobActivity.length === 0) {
     return (
       <Card>
-        <CardTitle>Job Activity - Last 24 Hours</CardTitle>
+        <CardTitle>{cardTitle}</CardTitle>
         <CardBody>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px', color: '#6a6e73' }}>
             <div style={{ textAlign: 'center' }}>
@@ -48,12 +87,27 @@ const JobActivityGraph: React.FC = () => {
     );
   }
 
-  const chartData = jobActivity.map(point => ({
-    time: new Date(point.timestamp).toLocaleTimeString('en-US', {
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+
+    // For 7d and 30d, show date
+    if (timePeriod === '7d' || timePeriod === '30d') {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    // For hourly periods, show time
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
-    }),
+    });
+  };
+
+  const chartData = jobActivity.map(point => ({
+    time: formatTime(point.timestamp),
     Running: point.running,
     Pending: point.pending,
     Completed: point.completed,
@@ -83,7 +137,7 @@ const JobActivityGraph: React.FC = () => {
 
   return (
     <Card>
-      <CardTitle>Job Activity - Last 24 Hours</CardTitle>
+      <CardTitle>{cardTitle}</CardTitle>
       <CardBody>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart

@@ -1,5 +1,6 @@
 export type JobStatus = 'PENDING' | 'SCHEDULED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 export type BatchStatus = 'PROCESSING' | 'COMPLETED' | 'COMPLETED_WITH_ERRORS' | 'COMPLETED_EMPTY' | 'FAILED' | 'CANCELLED';
+export type TimePeriod = '1h' | '6h' | '12h' | '24h' | '7d' | '30d';
 
 export interface Job {
   jobId: number;
@@ -69,6 +70,20 @@ export interface JobActivityDataPoint {
   completed: number;
   failed: number;
 }
+
+export const TIME_PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
+  { value: '1h', label: '1 Hour' },
+  { value: '6h', label: '6 Hours' },
+  { value: '12h', label: '12 Hours' },
+  { value: '24h', label: '24 Hours' },
+  { value: '7d', label: '7 Days' },
+  { value: '30d', label: '30 Days' },
+];
+
+export const getTimePeriodLabel = (timePeriod: TimePeriod): string => {
+  const option = TIME_PERIOD_OPTIONS.find(opt => opt.value === timePeriod);
+  return option ? option.label : '24 Hours';
+};
 
 export const WS_MESSAGE_TYPES = {
   CONNECTED: 'connected',
