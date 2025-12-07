@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import orchestratorApi from '../services/orchestratorApi';
-import { Job, JobBatch, OshScanWithJob, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES, JobActivityDataPoint } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary, WebSocketMessage, WS_MESSAGE_TYPES, JobActivityDataPoint, TimePeriod } from '../types';
 import { config } from '../config';
 
 interface DashboardContextType {
@@ -10,6 +10,8 @@ interface DashboardContextType {
   oshScans: OshScanWithJob[];
   summary: DashboardSummary | null;
   jobActivity: JobActivityDataPoint[];
+  timePeriod: TimePeriod;
+  setTimePeriod: (period: TimePeriod) => void;
   isWebSocketConnected: boolean;
   loading: boolean;
   error: string | null;
@@ -24,8 +26,18 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [oshScans, setOshScans] = useState<OshScanWithJob[]>([]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jobActivity, setJobActivity] = useState<JobActivityDataPoint[]>([]);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('24h');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchJobActivity = useCallback(async (period: TimePeriod) => {
+    try {
+      const activityData = await orchestratorApi.getJobActivity(period);
+      setJobActivity(activityData);
+    } catch (err) {
+      console.error('Failed to fetch job activity:', err);
+    }
+  }, []);
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
@@ -36,7 +48,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         orchestratorApi.getBatches({ size: 200 }),
         orchestratorApi.getOshScans({ size: 200 }),
         orchestratorApi.getDashboardSummary(),
-        orchestratorApi.getJobActivity24h()
+        orchestratorApi.getJobActivity(timePeriod)
       ]);
 
       setJobs(jobsData);
@@ -50,11 +62,15 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [timePeriod]);
 
   useEffect(() => {
     fetchInitialData();
   }, [fetchInitialData]);
+
+  useEffect(() => {
+    fetchJobActivity(timePeriod);
+  }, [timePeriod, fetchJobActivity]);
 
   const handleWebSocketMessage = useCallback((message: WebSocketMessage) => {
     console.log('Processing WebSocket message:', message);
@@ -125,6 +141,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         oshScans,
         summary,
         jobActivity,
+        timePeriod,
+        setTimePeriod,
         isWebSocketConnected,
         loading,
         error,
