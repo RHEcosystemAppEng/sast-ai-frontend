@@ -2,6 +2,9 @@
 
 namespace: sast-ai-dev
 
+consoleLink:
+  enabled: false
+
 app:
   env:
     REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-dev.apps.appeng.clusters.se-apps.redhat.com/api/v1"
