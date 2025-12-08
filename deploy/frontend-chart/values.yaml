@@ -51,8 +51,10 @@ namespace: ""
 clusterDomain: appeng.clusters.se-apps.redhat.com
 
 # OpenShift Console Integration
+# Note: ConsoleLink is disabled in Helm chart due to ArgoCD namespaced mode limitations
+# ConsoleLinks are created manually outside of ArgoCD
 consoleLink:
-  enabled: true
+  enabled: false
   text: "SAST AI Monitoring Dashboard"
   # List of namespaces where the dashboard link should appear
   namespaces:
