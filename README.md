@@ -1,6 +1,7 @@
 # SAST AI Monitoring Dashboard
 
-[![Build and Push Image](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml/badge.svg)](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-and-push-image.yml)
+[![Build Dev Image](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-dev-image.yml/badge.svg)](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-dev-image.yml)
+[![Build Release Image](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-release-image.yml/badge.svg)](https://github.com/RHEcosystemAppEng/sast-ai-frontend/actions/workflows/build-release-image.yml)
 [![Quay.io](https://img.shields.io/badge/quay.io-ecosystem--appeng%2Fsast--ai--frontend-blue?logo=redhat)](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend)
 
 Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator) with WebSocket updates.
@@ -347,6 +348,84 @@ The dashboard handles these message types:
    - Look for: `WebSocket connected`
    - Trigger job status change in orchestrator
    - Watch tables update in real-time
+
+## Release Management
+
+### Development Workflow
+
+**Automatic deployment on every push to main:**
+
+1. Developer pushes commit to `main` branch
+2. `build-dev-image.yml` workflow triggers automatically
+3. Two image tags are created:
+   - `latest` - Always points to the latest main branch build
+   - `main-{sha}` - Immutable commit-specific tag (e.g., `main-abc1234`)
+4. ArgoCD detects changes and auto-syncs to `sast-ai-dev` namespace using `latest` tag
+
+**Image tags created:**
+```
+quay.io/ecosystem-appeng/sast-ai-frontend:latest
+quay.io/ecosystem-appeng/sast-ai-frontend:main-abc1234
+```
+
+### Production Workflow
+
+**Manual release process for production deployments:**
+
+1. **Create a GitHub Release:**
+   ```bash
+   # Tag the release (e.g., v1.0.1)
+   git tag v1.0.1
+   git push origin v1.0.1
+
+   # Then create a release in GitHub UI or via gh CLI:
+   gh release create v1.0.1 --title "Release v1.0.1" --notes "Description of changes"
+   ```
+
+2. **Automated workflow execution:**
+   - `build-release-image.yml` triggers on release publication
+   - Builds and pushes images with tags: `latest` and `v1.0.1`
+   - Automatically updates version files:
+     - `package.json` → `"version": "1.0.1"`
+     - `deploy/frontend-chart/values-prod.yaml` → `tag: "v1.0.1"`
+     - `deploy/frontend-chart/Chart.yaml` → `version: 1.0.1`
+   - Commits changes back to main with message: `chore: Update version to v1.0.1 [skip ci]`
+
+3. **Manual ArgoCD sync:**
+   - Navigate to [ArgoCD Dashboard](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com)
+   - Find `sast-ai-frontend-prod` application (will show "OutOfSync")
+   - Click **SYNC** to deploy to production
+
+**Image tags created:**
+```
+quay.io/ecosystem-appeng/sast-ai-frontend:latest
+quay.io/ecosystem-appeng/sast-ai-frontend:v1.0.1
+```
+
+**Testing a specific commit:**
+```bash
+# Override image tag in values-dev.yaml temporarily
+helm upgrade sast-ai-frontend deploy/frontend-chart \
+  -n sast-ai-dev \
+  --set app.image.tag=main-abc1234
+```
+
+**Rolling back production to a previous version:**
+```bash
+# Manually edit values-prod.yaml or use --set
+helm upgrade sast-ai-frontend-prod deploy/frontend-chart \
+  -n sast-ai-prod \
+  -f deploy/frontend-chart/values-prod.yaml \
+  --set app.image.tag=v1.0.0
+```
+
+### Image Tag Strategy Summary
+
+| Environment | Tag Used | Update Method | Approval Required |
+|-------------|----------|---------------|-------------------|
+| **Development** | `latest` | Automatic (ArgoCD auto-sync) | No |
+| **Production** | `v1.0.x` | Manual (ArgoCD manual sync) | Yes |
+| **Testing/Rollback** | `main-{sha}` or `v1.0.x` | Manual (Helm override) | N/A |
 
 ## Links
 

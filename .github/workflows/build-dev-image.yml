@@ -1,8 +1,9 @@
-name: Build and Push Image
+name: Build Dev Image
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
   REGISTRY: quay.io
@@ -29,13 +30,18 @@ jobs:
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
 
-    - name: Extract metadata
+    - name: Generate development metadata
       id: meta
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=latest
+          type=raw,value=main-{{sha}}
+        labels: |
+          org.opencontainers.image.title=SAST AI Frontend (Development)
+          org.opencontainers.image.description=Real-time monitoring dashboard for SAST AI Orchestrator (Development Build)
+          org.opencontainers.image.vendor=Red Hat Ecosystem AppEng
 
     - name: Build and push Docker image
       id: build
