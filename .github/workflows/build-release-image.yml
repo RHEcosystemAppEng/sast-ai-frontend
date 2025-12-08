@@ -70,6 +70,11 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.build.outputs.digest }}
 
+    - name: Checkout main branch
+      run: |
+        git fetch origin main
+        git checkout main
+
     - name: Update package.json version
       run: |
         sed -i 's/"version": ".*"/"version": "${{ steps.version.outputs.version_no_v }}"/' package.json
@@ -89,4 +94,4 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add package.json deploy/frontend-chart/values-prod.yaml deploy/frontend-chart/Chart.yaml
         git commit -m "chore: Update version to ${{ steps.version.outputs.version }} [skip ci]"
-        git push
+        git push origin main
