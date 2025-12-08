@@ -5,6 +5,14 @@
 
 Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator) with WebSocket updates.
 
+## Deployment Status
+
+**Development:**
+[![ArgoCD App Status](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/api/badge?name=sast-ai-frontend-dev&revision=true)](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/applications/sast-ai-frontend-dev)
+
+**Production:**
+[![ArgoCD App Status](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/api/badge?name=sast-ai-frontend-prod&revision=true)](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/applications/sast-ai-frontend-prod)
+
 ## Prerequisites
 
 ### For Local Development
