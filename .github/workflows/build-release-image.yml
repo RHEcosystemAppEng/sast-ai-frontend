@@ -1,0 +1,92 @@
+name: Build Release Image
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: ecosystem-appeng/sast-ai-frontend
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Quay.io
+      uses: docker/login-action@v3
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+
+    - name: Extract version from tag
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        # Remove 'v' prefix for package.json and Chart.yaml
+        VERSION_NO_V=${VERSION#v}
+        echo "version_no_v=${VERSION_NO_V}" >> $GITHUB_OUTPUT
+
+    - name: Generate release metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=raw,value=latest
+          type=ref,event=tag
+        labels: |
+          org.opencontainers.image.title=SAST AI Frontend
+          org.opencontainers.image.description=Real-time monitoring dashboard for SAST AI Orchestrator
+          org.opencontainers.image.vendor=Red Hat Ecosystem AppEng
+          org.opencontainers.image.version=${{ steps.version.outputs.version }}
+
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+
+    - name: Image digest
+      run: echo ${{ steps.build.outputs.digest }}
+
+    - name: Update package.json version
+      run: |
+        sed -i 's/"version": ".*"/"version": "${{ steps.version.outputs.version_no_v }}"/' package.json
+
+    - name: Update Helm chart values-prod.yaml
+      run: |
+        sed -i 's/tag: ".*"/tag: "${{ steps.version.outputs.version }}"/' deploy/frontend-chart/values-prod.yaml
+
+    - name: Update Helm Chart.yaml
+      run: |
+        sed -i 's/^version: .*/version: ${{ steps.version.outputs.version_no_v }}/' deploy/frontend-chart/Chart.yaml
+        sed -i 's/^appVersion: .*/appVersion: "${{ steps.version.outputs.version_no_v }}"/' deploy/frontend-chart/Chart.yaml
+
+    - name: Commit version updates
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add package.json deploy/frontend-chart/values-prod.yaml deploy/frontend-chart/Chart.yaml
+        git commit -m "chore: Update version to ${{ steps.version.outputs.version }} [skip ci]"
+        git push

@@ -3,6 +3,10 @@
 namespace: sast-ai-prod
 
 app:
+  image:
+    pullPolicy: Always
+    tag: "v1.0.0"
+
   env:
     REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/api/v1"
     REACT_APP_WS_URL: "wss://sast-ai-orchestrator-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/ws/dashboard"
