@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Job, JobBatch, OshScanWithJob, DashboardSummary, JobActivityDataPoint, TimePeriod } from '../types';
+import { Job, JobBatch, OshScanWithJob, DashboardSummary, JobActivityDataPoint, TimePeriod, MonitoredPackagesResponse } from '../types';
 import { config } from '../config';
 
 class OrchestratorApi {
@@ -97,6 +97,16 @@ class OrchestratorApi {
     } catch (error) {
       console.error('Failed to fetch job activity:', error);
       return [];
+    }
+  }
+
+  async getMonitoredPackages(): Promise<MonitoredPackagesResponse> {
+    try {
+      const response = await this.client.get<MonitoredPackagesResponse>('/config/monitored-packages');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch monitored packages:', error);
+      throw error;
     }
   }
 }
