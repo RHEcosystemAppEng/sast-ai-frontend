@@ -15,6 +15,15 @@ const SidebarNavigation: React.FC = () => {
             Dashboard
           </NavLink>
         </NavItem>
+        <NavItem>
+          <NavLink
+            to="/packages"
+            className={({ isActive }) => isActive ? 'pf-m-current' : ''}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            Monitored Packages
+          </NavLink>
+        </NavItem>
         {/* Future navigation items can be added here */}
       </NavList>
     </Nav>

@@ -71,6 +71,13 @@ export interface JobActivityDataPoint {
   failed: number;
 }
 
+export interface MonitoredPackagesResponse {
+  packages: string[];
+  oshEnabled: boolean;
+  totalPackages: number;
+  packagesFilePath: string;
+}
+
 export const TIME_PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
   { value: '1h', label: '1 Hour' },
   { value: '6h', label: '6 Hours' },

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AppLayout from './AppLayout/AppLayout';
 import DashboardPage from './pages/Dashboard';
+import MonitoredPackagesPage from './pages/MonitoredPackages';
 
 const App: React.FC = () => {
   return (
@@ -9,6 +10,7 @@ const App: React.FC = () => {
       <AppLayout>
         <Routes>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/packages" element={<MonitoredPackagesPage />} />
         </Routes>
       </AppLayout>
     </Router>
