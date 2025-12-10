@@ -46,6 +46,7 @@ export interface OshScanWithJob {
     lastAttemptAt: string;
   } | null;
   processedAt: string;
+  oshTaskUrl: string;
 }
 
 export interface DashboardSummary {
