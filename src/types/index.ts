@@ -71,11 +71,12 @@ export interface JobActivityDataPoint {
   failed: number;
 }
 
-export interface MonitoredPackagesResponse {
-  packages: string[];
-  oshEnabled: boolean;
-  totalPackages: number;
-  packagesFilePath: string;
+export interface MonitoredPackageWithScans {
+  packageName: string;
+  oshScanCount: number;
+  lastOshScanDate: string | null;
+  completedOshScans: number;
+  failedOshScans: number;
 }
 
 export const TIME_PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
