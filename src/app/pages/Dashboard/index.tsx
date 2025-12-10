@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PageSection,
   Title,
@@ -17,11 +17,22 @@ import JobActivityGraph from '../../../components/JobActivityGraph';
 import JobsTable from '../../../components/JobsTable';
 import BatchesTable from '../../../components/BatchesTable';
 import OshScansTable from '../../../components/OshScansTable';
+import { formatRelativeTime } from '../../../utils/statusHelpers';
 
 const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string | number>('jobs');
-  const { isWebSocketConnected, error, loading, refetchAll } = useDashboard();
+  const { isWebSocketConnected, error, loading, refetchAll, lastUpdated } = useDashboard();
   const [showAlert, setShowAlert] = useState(true);
+  const [, setTick] = useState(0);
+
+  // Update the relative time display every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(prev => prev + 1);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -49,6 +60,14 @@ const DashboardPage: React.FC = () => {
                 <>
                   <DisconnectedIcon color="var(--pf-v5-global--warning-color--100)" />
                   <span style={{ color: 'var(--pf-v5-global--warning-color--100)' }}>Reconnecting...</span>
+                </>
+              )}
+              {lastUpdated && (
+                <>
+                  <span style={{ color: 'var(--pf-v5-global--Color--200)' }}>•</span>
+                  <span style={{ color: 'var(--pf-v5-global--Color--200)', fontSize: '0.875rem' }}>
+                    Updated {formatRelativeTime(lastUpdated)}
+                  </span>
                 </>
               )}
             </div>
