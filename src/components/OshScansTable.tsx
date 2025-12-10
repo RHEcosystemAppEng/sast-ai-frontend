@@ -72,7 +72,7 @@ const OshScansTable: React.FC = () => {
             <Th>Package</Th>
             <Th>NVR</Th>
             <Th>Status</Th>
-            <Th>Associated Job</Th>
+            <Th>Associated Job ID</Th>
             <Th>Retry Info</Th>
             <Th>Processed At</Th>
           </Tr>
@@ -102,23 +102,21 @@ const OshScansTable: React.FC = () => {
                 </Label>
               </Td>
               <Td>
-                {scan.associatedJob ? (
-                  <div>
-                    Job #{scan.associatedJob.jobId}
-                    {scan.associatedJob.tektonUrl && (
-                      <Button 
-                        variant="link" 
-                        size="sm" 
-                        component="a" 
-                        href={scan.associatedJob.tektonUrl} 
-                        target="_blank"
-                        icon={<ExternalLinkAltIcon />}
-                        iconPosition="end"
-                      >
-                        Tekton
-                      </Button>
-                    )}
-                  </div>
+                {scan.associatedJob && scan.associatedJob.tektonUrl ? (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    component="a"
+                    href={scan.associatedJob.tektonUrl}
+                    target="_blank"
+                    icon={<ExternalLinkAltIcon />}
+                    iconPosition="end"
+                    isInline
+                  >
+                    {scan.associatedJob.jobId}
+                  </Button>
+                ) : scan.associatedJob ? (
+                  scan.associatedJob.jobId
                 ) : (
                   '-'
                 )}
