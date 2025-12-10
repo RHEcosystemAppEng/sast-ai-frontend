@@ -80,7 +80,20 @@ const OshScansTable: React.FC = () => {
         <Tbody>
           {paginatedScans.map(scan => (
             <Tr key={scan.oshScanId}>
-              <Td>{scan.oshScanId}</Td>
+              <Td>
+                <Button
+                  variant="link"
+                  size="sm"
+                  component="a"
+                  href={scan.oshTaskUrl}
+                  target="_blank"
+                  icon={<ExternalLinkAltIcon />}
+                  iconPosition="end"
+                  isInline
+                >
+                  {scan.oshScanId}
+                </Button>
+              </Td>
               <Td>{scan.packageName}</Td>
               <Td>{scan.packageNvr}</Td>
               <Td>
