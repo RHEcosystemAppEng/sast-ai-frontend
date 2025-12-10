@@ -84,11 +84,11 @@ const MonitoredPackagesList: React.FC = () => {
     <Card style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <CardTitle style={{ flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>Monitored Packages</span>
+          <span>Actively monitored packages on Open Scan Hub (OSH) for SAST-AI</span>
           {data.oshEnabled ? (
-            <Label color="green" icon={<CheckCircleIcon />}>OSH Enabled</Label>
+            <Label color="green" icon={<CheckCircleIcon />}>Monitoring Enabled</Label>
           ) : (
-            <Label color="grey" icon={<TimesCircleIcon />}>OSH Disabled</Label>
+            <Label color="grey" icon={<TimesCircleIcon />}>Monitoring Disabled</Label>
           )}
         </div>
       </CardTitle>
@@ -110,7 +110,7 @@ const MonitoredPackagesList: React.FC = () => {
               <ToolbarContent>
                 <ToolbarItem>
                   <SearchInput
-                    placeholder="Search packages..."
+                    placeholder="Search monitored packages..."
                     value={searchValue}
                     onChange={(_event, value) => setSearchValue(value)}
                     onClear={() => setSearchValue('')}
