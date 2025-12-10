@@ -5,7 +5,7 @@ namespace: sast-ai-prod
 app:
   image:
     pullPolicy: Always
-    tag: "v1.0.0"
+    tag: "v1.0.1"
 
   env:
     REACT_APP_ORCHESTRATOR_API_URL: "https://sast-ai-orchestrator-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com/api/v1"
