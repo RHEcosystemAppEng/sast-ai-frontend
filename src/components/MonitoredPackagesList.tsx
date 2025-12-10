@@ -85,14 +85,11 @@ const MonitoredPackagesList: React.FC = () => {
       <CardTitle style={{ flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>Monitored Packages</span>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            {data.oshEnabled ? (
-              <Label color="green" icon={<CheckCircleIcon />}>OSH Enabled</Label>
-            ) : (
-              <Label color="grey" icon={<TimesCircleIcon />}>OSH Disabled</Label>
-            )}
-            <Label color="blue">{data.totalPackages} packages</Label>
-          </div>
+          {data.oshEnabled ? (
+            <Label color="green" icon={<CheckCircleIcon />}>OSH Enabled</Label>
+          ) : (
+            <Label color="grey" icon={<TimesCircleIcon />}>OSH Disabled</Label>
+          )}
         </div>
       </CardTitle>
       <CardBody style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -121,11 +118,11 @@ const MonitoredPackagesList: React.FC = () => {
                   />
                 </ToolbarItem>
                 <ToolbarItem>
-                  <span style={{ color: 'var(--pf-v5-global--Color--200)' }}>
+                  <Label color="blue">
                     {searchValue
                       ? `${filteredPackages.length} of ${data.totalPackages} packages`
                       : `${data.totalPackages} packages`}
-                  </span>
+                  </Label>
                 </ToolbarItem>
               </ToolbarContent>
             </Toolbar>
