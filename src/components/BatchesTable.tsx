@@ -17,7 +17,7 @@ import { getBatchStatusColor, formatDateTime } from '../utils/statusHelpers';
 const BatchesTable: React.FC = () => {
   const { batches } = useDashboard();
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(20);
+  const [perPage, setPerPage] = useState(10);
 
   const paginatedBatches = useMemo(() => {
     const start = (page - 1) * perPage;
@@ -60,7 +60,7 @@ const BatchesTable: React.FC = () => {
         </ToolbarContent>
       </Toolbar>
 
-      <Table variant="compact" aria-label="Batches table">
+      <Table variant="compact" aria-label="Batches table" isStickyHeader>
         <Thead>
           <Tr>
             <Th>Batch ID</Th>
