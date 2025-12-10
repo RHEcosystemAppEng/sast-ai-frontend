@@ -65,7 +65,7 @@ const OshScansTable: React.FC = () => {
         </ToolbarContent>
       </Toolbar>
 
-      <Table variant="compact" aria-label="OSH Scans table">
+      <Table variant="compact" aria-label="OSH Scans table" isStickyHeader>
         <Thead>
           <Tr>
             <Th>OSH Scan ID</Th>

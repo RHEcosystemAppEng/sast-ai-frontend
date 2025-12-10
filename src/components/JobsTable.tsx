@@ -73,7 +73,7 @@ const JobsTable: React.FC = () => {
         </ToolbarContent>
       </Toolbar>
 
-      <Table variant="compact" aria-label="Jobs table">
+      <Table variant="compact" aria-label="Jobs table" isStickyHeader>
         <Thead>
           <Tr>
             <Th>Job ID</Th>

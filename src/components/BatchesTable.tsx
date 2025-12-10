@@ -60,7 +60,7 @@ const BatchesTable: React.FC = () => {
         </ToolbarContent>
       </Toolbar>
 
-      <Table variant="compact" aria-label="Batches table">
+      <Table variant="compact" aria-label="Batches table" isStickyHeader>
         <Thead>
           <Tr>
             <Th>Batch ID</Th>
