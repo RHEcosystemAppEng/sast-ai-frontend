@@ -82,13 +82,29 @@ const JobsTable: React.FC = () => {
             <Th>OSH Scan ID</Th>
             <Th>Created At</Th>
             <Th>Submitted By</Th>
-            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
           {paginatedJobs.map(job => (
             <Tr key={job.jobId}>
-              <Td>{job.jobId}</Td>
+              <Td>
+                {job.tektonUrl ? (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    component="a"
+                    href={job.tektonUrl}
+                    target="_blank"
+                    icon={<ExternalLinkAltIcon />}
+                    iconPosition="end"
+                    isInline
+                  >
+                    {job.jobId}
+                  </Button>
+                ) : (
+                  job.jobId
+                )}
+              </Td>
               <Td>
                 <div>
                   <strong>{job.packageName || job.packageNvr}</strong>
@@ -107,21 +123,6 @@ const JobsTable: React.FC = () => {
               <Td>{job.oshScanId || '-'}</Td>
               <Td>{formatDateTime(job.createdAt)}</Td>
               <Td>{job.submittedBy || '-'}</Td>
-              <Td>
-                {job.tektonUrl && (
-                  <Button 
-                    variant="link" 
-                    size="sm" 
-                    component="a" 
-                    href={job.tektonUrl} 
-                    target="_blank"
-                    icon={<ExternalLinkAltIcon />}
-                    iconPosition="end"
-                  >
-                    Tekton
-                  </Button>
-                )}
-              </Td>
             </Tr>
           ))}
         </Tbody>

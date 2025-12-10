@@ -35,7 +35,7 @@ const JobActivityGraph: React.FC = () => {
 
   const cardTitle = (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <span>Job Activity - {getTimePeriodLabel(timePeriod)}</span>
+      <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Job Activity - {getTimePeriodLabel(timePeriod)}</span>
       <Select
         id="time-period-select"
         isOpen={isSelectOpen}

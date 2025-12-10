@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PageSection,
   Title,
@@ -17,11 +17,22 @@ import JobActivityGraph from '../../../components/JobActivityGraph';
 import JobsTable from '../../../components/JobsTable';
 import BatchesTable from '../../../components/BatchesTable';
 import OshScansTable from '../../../components/OshScansTable';
+import { formatRelativeTime } from '../../../utils/statusHelpers';
 
 const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string | number>('jobs');
-  const { isWebSocketConnected, error, loading, refetchAll } = useDashboard();
+  const { isWebSocketConnected, error, loading, refetchAll, lastUpdated } = useDashboard();
   const [showAlert, setShowAlert] = useState(true);
+  const [, setTick] = useState(0);
+
+  // Update the relative time display every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(prev => prev + 1);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -49,6 +60,14 @@ const DashboardPage: React.FC = () => {
                 <>
                   <DisconnectedIcon color="var(--pf-v5-global--warning-color--100)" />
                   <span style={{ color: 'var(--pf-v5-global--warning-color--100)' }}>Reconnecting...</span>
+                </>
+              )}
+              {lastUpdated && (
+                <>
+                  <span style={{ color: 'var(--pf-v5-global--Color--200)' }}>•</span>
+                  <span style={{ color: 'var(--pf-v5-global--Color--200)', fontSize: '0.875rem' }}>
+                    Updated {formatRelativeTime(lastUpdated)}
+                  </span>
                 </>
               )}
             </div>
@@ -97,7 +116,7 @@ const DashboardPage: React.FC = () => {
         >
           <Tab
             eventKey="jobs"
-            title={<TabTitleText>Jobs</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>Jobs</span></TabTitleText>}
             aria-label="Jobs tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
@@ -106,7 +125,7 @@ const DashboardPage: React.FC = () => {
           </Tab>
           <Tab
             eventKey="batches"
-            title={<TabTitleText>Batches</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>Batches</span></TabTitleText>}
             aria-label="Batches tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
@@ -115,7 +134,7 @@ const DashboardPage: React.FC = () => {
           </Tab>
           <Tab
             eventKey="osh"
-            title={<TabTitleText>OSH Scans</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>OSH Scans</span></TabTitleText>}
             aria-label="OSH Scans tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
