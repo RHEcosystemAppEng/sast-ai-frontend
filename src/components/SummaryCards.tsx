@@ -161,11 +161,13 @@ const SummaryCards: React.FC = () => {
     <div style={{
       display: 'flex',
       justifyContent: 'center',
-      gap: '24px',
+      gap: '100px',
       width: '100%'
     }}>
       <Card style={{ flex: '0 1 320px' }}>
-        <CardTitle>Jobs</CardTitle>
+        <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
+          Jobs
+        </CardTitle>
         <CardBody>
           <DonutChart
             data={transformJobsData(summary)}
@@ -175,7 +177,9 @@ const SummaryCards: React.FC = () => {
       </Card>
 
       <Card style={{ flex: '0 1 320px' }}>
-        <CardTitle>Batches</CardTitle>
+        <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
+          Batches
+        </CardTitle>
         <CardBody>
           <DonutChart
             data={transformBatchesData(summary)}
@@ -185,7 +189,9 @@ const SummaryCards: React.FC = () => {
       </Card>
 
       <Card style={{ flex: '0 1 320px' }}>
-        <CardTitle>OSH Scans</CardTitle>
+        <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
+          OSH Scans
+        </CardTitle>
         <CardBody>
           <DonutChart
             data={transformOshScansData(summary)}

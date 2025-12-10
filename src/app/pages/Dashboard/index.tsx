@@ -116,7 +116,7 @@ const DashboardPage: React.FC = () => {
         >
           <Tab
             eventKey="jobs"
-            title={<TabTitleText>Jobs</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>Jobs</span></TabTitleText>}
             aria-label="Jobs tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
@@ -125,7 +125,7 @@ const DashboardPage: React.FC = () => {
           </Tab>
           <Tab
             eventKey="batches"
-            title={<TabTitleText>Batches</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>Batches</span></TabTitleText>}
             aria-label="Batches tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
@@ -134,7 +134,7 @@ const DashboardPage: React.FC = () => {
           </Tab>
           <Tab
             eventKey="osh"
-            title={<TabTitleText>OSH Scans</TabTitleText>}
+            title={<TabTitleText><span style={{ fontWeight: 'bold' }}>OSH Scans</span></TabTitleText>}
             aria-label="OSH Scans tab"
           >
             <div style={{ paddingTop: 'var(--pf-v5-global--spacer--md)' }}>
