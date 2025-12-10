@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import MonitoredPackagesList from '../../../components/MonitoredPackagesList';
+import MonitoredPackagesTable from '../../../components/MonitoredPackagesTable';
 
 const MonitoredPackagesPage: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const MonitoredPackagesPage: React.FC = () => {
       </PageSection>
 
       <PageSection style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <MonitoredPackagesList />
+        <MonitoredPackagesTable />
       </PageSection>
     </div>
   );
