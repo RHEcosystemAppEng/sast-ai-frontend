@@ -81,8 +81,8 @@ const MonitoredPackagesList: React.FC = () => {
   }
 
   return (
-    <Card>
-      <CardTitle>
+    <Card style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <CardTitle style={{ flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>Monitored Packages</span>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -95,7 +95,7 @@ const MonitoredPackagesList: React.FC = () => {
           </div>
         </div>
       </CardTitle>
-      <CardBody>
+      <CardBody style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {data.totalPackages === 0 ? (
           <EmptyState>
             <EmptyStateHeader
@@ -109,7 +109,7 @@ const MonitoredPackagesList: React.FC = () => {
           </EmptyState>
         ) : (
           <>
-            <Toolbar>
+            <Toolbar style={{ flexShrink: 0 }}>
               <ToolbarContent>
                 <ToolbarItem>
                   <SearchInput
@@ -131,12 +131,13 @@ const MonitoredPackagesList: React.FC = () => {
             </Toolbar>
 
             <div style={{
-              maxHeight: '400px',
+              flexGrow: 1,
               overflowY: 'auto',
               marginTop: '16px',
               border: '1px solid var(--pf-v5-global--BorderColor--100)',
               borderRadius: 'var(--pf-v5-global--BorderRadius--sm)',
-              padding: '8px'
+              padding: '8px',
+              minHeight: 0
             }}>
               {filteredPackages.length > 0 ? (
                 <List isPlain isBordered={false}>
@@ -168,7 +169,8 @@ const MonitoredPackagesList: React.FC = () => {
               <div style={{
                 marginTop: '16px',
                 fontSize: 'var(--pf-v5-global--FontSize--sm)',
-                color: 'var(--pf-v5-global--Color--200)'
+                color: 'var(--pf-v5-global--Color--200)',
+                flexShrink: 0
               }}>
                 Source: <code>{data.packagesFilePath}</code>
               </div>
