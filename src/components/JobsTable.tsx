@@ -17,7 +17,7 @@ import { getJobStatusColor, formatDateTime } from '../utils/statusHelpers';
 const JobsTable: React.FC = () => {
   const { jobs } = useDashboard();
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(20);
+  const [perPage, setPerPage] = useState(10);
   const [filter, setFilter] = useState('');
 
   const filteredJobs = useMemo(() => {

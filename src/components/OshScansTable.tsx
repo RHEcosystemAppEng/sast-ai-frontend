@@ -17,7 +17,7 @@ import { formatDateTime } from '../utils/statusHelpers';
 const OshScansTable: React.FC = () => {
   const { oshScans } = useDashboard();
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(20);
+  const [perPage, setPerPage] = useState(10);
   const [filter, setFilter] = useState('');
 
   const filteredScans = useMemo(() => {
