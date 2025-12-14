@@ -10,7 +10,7 @@ import {
   AlertActionCloseButton,
   Button
 } from '@patternfly/react-core';
-import { ConnectedIcon, DisconnectedIcon, SyncIcon } from '@patternfly/react-icons';
+import { ConnectedIcon, DisconnectedIcon, SyncIcon, ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { useDashboard } from '../../../context/DashboardContext';
 import SummaryCards from '../../../components/SummaryCards';
 import JobActivityGraph from '../../../components/JobActivityGraph';
@@ -18,6 +18,7 @@ import JobsTable from '../../../components/JobsTable';
 import BatchesTable from '../../../components/BatchesTable';
 import OshScansTable from '../../../components/OshScansTable';
 import { formatRelativeTime } from '../../../utils/statusHelpers';
+import { config } from '../../../config';
 
 const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string | number>('jobs');
@@ -38,9 +39,25 @@ const DashboardPage: React.FC = () => {
     <>
       <PageSection variant="light">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title headingLevel="h1" size="2xl">
-            SAST AI Monitoring Dashboard
-          </Title>
+          <div>
+            <Title headingLevel="h1" size="2xl">
+              SAST AI Monitoring Dashboard
+            </Title>
+            {config.grafanaUrl && (
+              <Button
+                variant="link"
+                component="a"
+                href={config.grafanaUrl}
+                target="_blank"
+                icon={<ExternalLinkAltIcon />}
+                iconPosition="end"
+                isInline
+                style={{ paddingLeft: 0, marginTop: 'var(--pf-v5-global--spacer--xs)' }}
+              >
+                View Grafana Dashboard
+              </Button>
+            )}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--pf-v5-global--spacer--md)' }}>
             <Button
               variant="secondary"

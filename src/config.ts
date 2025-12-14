@@ -1,6 +1,7 @@
 interface Config {
   apiUrl: string;
   wsUrl: string;
+  grafanaUrl?: string;
   isDevelopment: boolean;
 }
 
@@ -10,6 +11,7 @@ declare global {
     _env_?: {
       REACT_APP_ORCHESTRATOR_API_URL?: string;
       REACT_APP_WS_URL?: string;
+      REACT_APP_GRAFANA_URL?: string;
     };
   }
 }
@@ -19,6 +21,7 @@ function validateConfig(): Config {
   // Fall back to process.env (build-time config)
   const apiUrl = window._env_?.REACT_APP_ORCHESTRATOR_API_URL || process.env.REACT_APP_ORCHESTRATOR_API_URL;
   const wsUrl = window._env_?.REACT_APP_WS_URL || process.env.REACT_APP_WS_URL;
+  const grafanaUrl = window._env_?.REACT_APP_GRAFANA_URL || process.env.REACT_APP_GRAFANA_URL;
 
   const defaultApiUrl = 'http://localhost:8080/api/v1';
   const defaultWsUrl = 'ws://localhost:8080/ws/dashboard';
@@ -58,12 +61,14 @@ function validateConfig(): Config {
   console.log('Configuration loaded:', {
     apiUrl: finalApiUrl,
     wsUrl: finalWsUrl,
+    grafanaUrl: grafanaUrl || 'not configured',
     environment: process.env.NODE_ENV || 'development'
   });
 
   return {
     apiUrl: finalApiUrl,
     wsUrl: finalWsUrl,
+    grafanaUrl: grafanaUrl,
     isDevelopment: process.env.NODE_ENV === 'development'
   };
 }
