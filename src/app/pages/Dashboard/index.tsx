@@ -117,11 +117,19 @@ const DashboardPage: React.FC = () => {
       )}
 
       <PageSection>
-        <SummaryCards />
-      </PageSection>
-
-      <PageSection>
-        <JobActivityGraph />
+        <div style={{
+          display: 'flex',
+          gap: '24px',
+          alignItems: 'stretch',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ flex: '1 1 auto', minWidth: '0', display: 'flex' }}>
+            <SummaryCards />
+          </div>
+          <div style={{ flex: '1 1 500px', minWidth: '500px', display: 'flex' }}>
+            <JobActivityGraph />
+          </div>
+        </div>
       </PageSection>
 
       <PageSection>

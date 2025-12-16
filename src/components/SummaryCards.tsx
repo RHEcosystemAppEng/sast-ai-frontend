@@ -117,8 +117,8 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, total }) => {
   }
 
   return (
-    <div>
-      <ResponsiveContainer width="100%" height={200}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
+      <ResponsiveContainer width="100%" height="70%">
         <PieChart>
           <Pie
             data={filteredData}
@@ -132,7 +132,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, total }) => {
             <Label
               value={total}
               position="center"
-              style={{ fontSize: '32px', fontWeight: 'bold', fill: '#151515' }}
+              style={{ fontSize: '36px', fontWeight: 'bold', fill: '#151515' }}
             />
             {filteredData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -161,14 +161,15 @@ const SummaryCards: React.FC = () => {
     <div style={{
       display: 'flex',
       justifyContent: 'center',
-      gap: '100px',
-      width: '100%'
+      gap: '24px',
+      width: '100%',
+      height: '100%'
     }}>
-      <Card style={{ flex: '0 1 320px' }}>
+      <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
           Jobs
         </CardTitle>
-        <CardBody>
+        <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
             data={transformJobsData(summary)}
             total={summary.totalJobs}
@@ -176,11 +177,11 @@ const SummaryCards: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card style={{ flex: '0 1 320px' }}>
+      <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
           Batches
         </CardTitle>
-        <CardBody>
+        <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
             data={transformBatchesData(summary)}
             total={summary.totalBatches}
@@ -188,11 +189,11 @@ const SummaryCards: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card style={{ flex: '0 1 320px' }}>
+      <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
           OSH Scans
         </CardTitle>
-        <CardBody>
+        <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
             data={transformOshScansData(summary)}
             total={summary.totalOshScans}
