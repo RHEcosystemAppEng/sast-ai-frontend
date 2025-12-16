@@ -109,6 +109,16 @@ class OrchestratorApi {
       throw error;
     }
   }
+
+  async reloadMonitoredPackages(): Promise<any> {
+    try {
+      const response = await this.client.post('/admin/config/reload-packages');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to reload monitored packages:', error);
+      throw error;
+    }
+  }
 }
 
 const orchestratorApiInstance = new OrchestratorApi();
