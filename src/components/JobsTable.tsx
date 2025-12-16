@@ -137,7 +137,7 @@ const JobsTable: React.FC = () => {
                   {job.status}
                 </Label>
               </Td>
-              <Td>{job.oshScanId || '-'}</Td>
+              <Td>{job.oshScanId || 'Manual'}</Td>
               <Td>{formatDateTime(job.createdAt)}</Td>
               <Td>{job.submittedBy || '-'}</Td>
             </Tr>
