@@ -133,7 +133,7 @@ const JobsTable: React.FC = () => {
                 </div>
               </Td>
               <Td>
-                <Label color={getJobStatusColor(job.status)}>
+                <Label color={getJobStatusColor(job.status)} style={{ minWidth: '100px', display: 'inline-block', textAlign: 'center' }}>
                   {job.status}
                 </Label>
               </Td>
