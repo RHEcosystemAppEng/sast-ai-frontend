@@ -8,9 +8,10 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarItem,
-  SearchInput
+  SearchInput,
+  Popover
 } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { ExternalLinkAltIcon, InfoCircleIcon } from '@patternfly/react-icons';
 import { useDashboard } from '../context/DashboardContext';
 import { getJobStatusColor, formatDateTime } from '../utils/statusHelpers';
 
@@ -76,7 +77,23 @@ const JobsTable: React.FC = () => {
       <Table variant="compact" aria-label="Jobs table" isStickyHeader>
         <Thead>
           <Tr>
-            <Th>Job ID</Th>
+            <Th>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Job ID
+                <Popover
+                  aria-label="Job ID info"
+                  bodyContent="Click Job ID to view the Tekton PipelineRun in OpenShift console"
+                >
+                  <Button
+                    variant="plain"
+                    aria-label="More info for Job ID"
+                    style={{ padding: 0, minWidth: 'auto', height: 'auto', lineHeight: 0 }}
+                  >
+                    <InfoCircleIcon style={{ fontSize: '14px', color: '#6a6e73', verticalAlign: 'middle' }} />
+                  </Button>
+                </Popover>
+              </div>
+            </Th>
             <Th>Package</Th>
             <Th>Status</Th>
             <Th>OSH Scan ID</Th>
