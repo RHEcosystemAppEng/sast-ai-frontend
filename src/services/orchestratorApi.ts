@@ -56,29 +56,11 @@ class OrchestratorApi {
     }
   }
 
-  // Summary (aggregate from multiple endpoints)
-  async getDashboardSummary(): Promise<DashboardSummary> {
+  async getDashboardSummary(timePeriod?: TimePeriod): Promise<DashboardSummary> {
     try {
-      // Fetch jobs to calculate statistics
-      const jobs = await this.getJobs({ size: 1000 }); // Get recent jobs
-      const batches = await this.getBatches({ size: 1000 });
-
-      const summary: DashboardSummary = {
-        totalJobs: jobs.length,
-        pendingJobs: jobs.filter(j => j.status === 'PENDING').length,
-        runningJobs: jobs.filter(j => j.status === 'RUNNING').length,
-        completedJobs: jobs.filter(j => j.status === 'COMPLETED').length,
-        failedJobs: jobs.filter(j => j.status === 'FAILED').length,
-        cancelledJobs: jobs.filter(j => j.status === 'CANCELLED').length,
-        totalBatches: batches.length,
-        processingBatches: batches.filter(b => b.status === 'PROCESSING').length,
-        completedBatches: batches.filter(b => b.status === 'COMPLETED' || b.status === 'COMPLETED_WITH_ERRORS').length,
-        totalOshScans: jobs.filter(j => j.oshScanId).length,
-        collectedOshScans: jobs.filter(j => j.oshScanId && j.status !== 'FAILED').length,
-        uncollectedOshScans: 0 // Will be calculated from OSH API later
-      };
-
-      return summary;
+      const params = timePeriod ? { timePeriod } : {};
+      const response = await this.client.get<DashboardSummary>('/dashboard/summary', { params });
+      return response.data;
     } catch (error) {
       console.error('Failed to fetch dashboard summary:', error);
       throw error;
@@ -106,6 +88,16 @@ class OrchestratorApi {
       return response.data;
     } catch (error) {
       console.error('Failed to fetch monitored packages with scans:', error);
+      throw error;
+    }
+  }
+
+  async reloadMonitoredPackages(): Promise<any> {
+    try {
+      const response = await this.client.post('/admin/config/reload-packages');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to reload monitored packages:', error);
       throw error;
     }
   }

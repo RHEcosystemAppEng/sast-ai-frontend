@@ -7,6 +7,7 @@ import {
 } from '@patternfly/react-core';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Label } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
+import { getTimePeriodLabel } from '../types';
 
 // Color constants matching PatternFly color scheme
 const COLORS = {
@@ -147,7 +148,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, total }) => {
 };
 
 const SummaryCards: React.FC = () => {
-  const { summary, loading } = useDashboard();
+  const { summary, loading, timePeriod } = useDashboard();
 
   if (loading || !summary) {
     return (
@@ -156,6 +157,8 @@ const SummaryCards: React.FC = () => {
       </div>
     );
   }
+
+  const timePeriodLabel = getTimePeriodLabel(timePeriod);
 
   return (
     <div style={{
@@ -166,7 +169,7 @@ const SummaryCards: React.FC = () => {
     }}>
       <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
-          Jobs
+          Jobs - {timePeriodLabel}
         </CardTitle>
         <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
@@ -178,7 +181,7 @@ const SummaryCards: React.FC = () => {
 
       <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
-          Batches
+          Batches - {timePeriodLabel}
         </CardTitle>
         <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
@@ -190,7 +193,7 @@ const SummaryCards: React.FC = () => {
 
       <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
         <CardTitle style={{ fontSize: '1.25rem', fontWeight: 'bold', textAlign: 'center' }}>
-          OSH Scans
+          OSH Scans - {timePeriodLabel}
         </CardTitle>
         <CardBody style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <DonutChart
