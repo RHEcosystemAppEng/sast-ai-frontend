@@ -121,12 +121,12 @@ const DashboardPage: React.FC = () => {
           display: 'flex',
           gap: '24px',
           alignItems: 'stretch',
-          flexWrap: 'wrap'
+          justifyContent: 'flex-start'
         }}>
-          <div style={{ flex: '1 1 auto', minWidth: '0', display: 'flex' }}>
+          <div style={{ flex: '0 0 auto', display: 'flex' }}>
             <SummaryCards />
           </div>
-          <div style={{ flex: '1 1 500px', minWidth: '500px', display: 'flex' }}>
+          <div style={{ flex: '1 1 auto', display: 'flex' }}>
             <JobActivityGraph />
           </div>
         </div>

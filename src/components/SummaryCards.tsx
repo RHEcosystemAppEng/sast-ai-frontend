@@ -160,9 +160,8 @@ const SummaryCards: React.FC = () => {
   return (
     <div style={{
       display: 'flex',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       gap: '24px',
-      width: '100%',
       height: '100%'
     }}>
       <Card style={{ flex: '0 1 320px', display: 'flex', flexDirection: 'column' }}>
