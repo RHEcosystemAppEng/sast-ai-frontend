@@ -179,7 +179,7 @@ const MonitoredPackagesTable: React.FC = () => {
             paginatedPackages.map(pkg => (
               <Tr key={pkg.packageName}>
                 <Td>
-                  <strong>{pkg.packageName}</strong>
+                  {pkg.packageName}
                 </Td>
                 <Td>
                   {pkg.oshScanCount > 0 ? (
