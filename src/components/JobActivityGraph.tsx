@@ -61,7 +61,7 @@ const JobActivityGraph: React.FC = () => {
 
   if (loading) {
     return (
-      <Card>
+      <Card style={{ width: '100%' }}>
         <CardTitle>{cardTitle}</CardTitle>
         <CardBody>
           <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', height: '300px', alignItems: 'center' }}>
@@ -74,7 +74,7 @@ const JobActivityGraph: React.FC = () => {
 
   if (!jobActivity || jobActivity.length === 0) {
     return (
-      <Card>
+      <Card style={{ width: '100%' }}>
         <CardTitle>{cardTitle}</CardTitle>
         <CardBody>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px', color: '#6a6e73' }}>
@@ -136,7 +136,7 @@ const JobActivityGraph: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card style={{ width: '100%' }}>
       <CardTitle>{cardTitle}</CardTitle>
       <CardBody>
         <ResponsiveContainer width="100%" height={300}>

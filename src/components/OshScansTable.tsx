@@ -97,7 +97,7 @@ const OshScansTable: React.FC = () => {
               <Td>{scan.packageName}</Td>
               <Td>{scan.packageNvr}</Td>
               <Td>
-                <Label color={getStatusColor(scan.status)}>
+                <Label color={getStatusColor(scan.status)} style={{ minWidth: '110px', display: 'inline-block', textAlign: 'center' }}>
                   {scan.status}
                 </Label>
               </Td>

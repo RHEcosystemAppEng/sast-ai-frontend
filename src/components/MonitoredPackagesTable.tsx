@@ -8,8 +8,10 @@ import {
   ToolbarContent,
   ToolbarItem,
   SearchInput,
-  Spinner
+  Spinner,
+  Button
 } from '@patternfly/react-core';
+import { SyncIcon } from '@patternfly/react-icons';
 import { MonitoredPackageWithScans } from '../types';
 import orchestratorApi from '../services/orchestratorApi';
 import { formatDateTime } from '../utils/statusHelpers';
@@ -18,6 +20,7 @@ const MonitoredPackagesTable: React.FC = () => {
   const [packages, setPackages] = useState<MonitoredPackageWithScans[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloading, setReloading] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [filter, setFilter] = useState('');
@@ -40,6 +43,19 @@ const MonitoredPackagesTable: React.FC = () => {
       setPackages([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReload = async () => {
+    try {
+      setReloading(true);
+      await orchestratorApi.reloadMonitoredPackages();
+      await fetchPackages();
+    } catch (err) {
+      console.error('Error reloading packages:', err);
+      setError('Failed to reload monitored packages');
+    } finally {
+      setReloading(false);
     }
   };
 
@@ -139,6 +155,16 @@ const MonitoredPackagesTable: React.FC = () => {
               onClear={() => setFilter('')}
             />
           </ToolbarItem>
+          <ToolbarItem>
+            <Button
+              variant="secondary"
+              onClick={handleReload}
+              isDisabled={reloading || loading}
+              icon={<SyncIcon />}
+            >
+              {reloading ? 'Reloading...' : 'Reload Packages'}
+            </Button>
+          </ToolbarItem>
           <ToolbarItem align={{ default: 'alignRight' }}>
             <Pagination
               itemCount={sortedPackages.length}
@@ -179,7 +205,7 @@ const MonitoredPackagesTable: React.FC = () => {
             paginatedPackages.map(pkg => (
               <Tr key={pkg.packageName}>
                 <Td>
-                  <strong>{pkg.packageName}</strong>
+                  {pkg.packageName}
                 </Td>
                 <Td>
                   {pkg.oshScanCount > 0 ? (

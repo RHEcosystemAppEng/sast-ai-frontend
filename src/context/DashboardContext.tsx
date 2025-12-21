@@ -41,6 +41,15 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
+  const fetchSummary = useCallback(async (period: TimePeriod) => {
+    try {
+      const summaryData = await orchestratorApi.getDashboardSummary(period);
+      setSummary(summaryData);
+    } catch (err) {
+      console.error('Failed to fetch dashboard summary:', err);
+    }
+  }, []);
+
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -49,7 +58,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         orchestratorApi.getJobs({ size: 200 }),
         orchestratorApi.getBatches({ size: 200 }),
         orchestratorApi.getOshScans({ size: 200 }),
-        orchestratorApi.getDashboardSummary(),
+        orchestratorApi.getDashboardSummary(timePeriod),
         orchestratorApi.getJobActivity(timePeriod)
       ]);
 
@@ -71,9 +80,11 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     fetchInitialData();
   }, [fetchInitialData]);
 
+  // Refetch activity graph and summary when time period changes
   useEffect(() => {
     fetchJobActivity(timePeriod);
-  }, [timePeriod, fetchJobActivity]);
+    fetchSummary(timePeriod);
+  }, [timePeriod, fetchJobActivity, fetchSummary]);
 
   const handleWebSocketMessage = useCallback((message: WebSocketMessage) => {
     console.log('Processing WebSocket message:', message);
@@ -111,8 +122,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
 
       case WS_MESSAGE_TYPES.SUMMARY_UPDATE:
-        setSummary(message.data);
-        setLastUpdated(new Date());
+        // Ignore WebSocket summary updates when time filtering is active
+        // Summary will be updated when user changes time period or manually refetches
+        // This prevents unfiltered WebSocket data from overriding time-filtered summaries
         break;
 
       case WS_MESSAGE_TYPES.OSH_SCAN_COLLECTED:
