@@ -1,6 +1,6 @@
 {
   "name": "sast-ai-frontend",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Real-time monitoring dashboard for SAST AI Orchestrator with WebSocket updates",
   "private": true,
   "dependencies": {
