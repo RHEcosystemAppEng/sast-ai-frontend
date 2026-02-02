@@ -18,6 +18,33 @@ This document describes the internal architecture of the SAST AI Monitoring Dash
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── AppLayout/          # Main layout with sidebar navigation
+│   └── pages/              # Route-level page components
+│       ├── Dashboard/      # Main dashboard view
+│       └── MonitoredPackages/
+├── components/             # Reusable UI components
+│   ├── JobsTable.tsx       # Jobs data table
+│   ├── BatchesTable.tsx    # Batches data table
+│   ├── OshScansTable.tsx   # OSH scans data table
+│   ├── SummaryCards.tsx    # Metric summary cards
+│   └── JobActivityGraph.tsx # 24-hour activity chart
+├── context/
+│   └── DashboardContext.tsx # Central state management
+├── hooks/
+│   └── useWebSocket.ts     # WebSocket connection hook
+├── services/
+│   └── orchestratorApi.ts  # REST API client
+├── types/
+│   └── index.ts            # TypeScript interfaces
+└── utils/
+    └── statusHelpers.ts    # Status formatting utilities
+```
+
 ## Data Flow
 
 ### 1. Initial Load (REST API)
@@ -32,16 +59,18 @@ DashboardContext → orchestratorApi.getDashboardSummary() → Update state
 DashboardContext → orchestratorApi.getJobActivity24h() → Update state
 ```
 
-**Additional API Methods:**
-- `getJobById(jobId)` - Fetch individual job details
-- `getBatchById(batchId)` - Fetch individual batch details
-- `getOshStatus()` - Fetch OSH status
+**Available API Methods:**
+- `getJobs()` / `getJobById(jobId)` - Fetch jobs
+- `getBatches()` / `getBatchById(batchId)` - Fetch batches
+- `getOshScans()` / `getOshStatus()` - Fetch OSH data
+- `getDashboardSummary()` - Fetch summary metrics
+- `getJobActivity24h()` - Fetch activity graph data
 - `getHealth()` - Health check endpoint
 
 ### 2. Real-time Updates (WebSocket)
 
 ```
-Orchestrator → ws://dashboard → DashboardContext → Update state → Components re-render
+Orchestrator → ws://dashboard → useWebSocket hook → DashboardContext → Components re-render
 ```
 
 WebSocket features:
@@ -50,13 +79,13 @@ WebSocket features:
 
 ### 3. State to UI Mapping
 
-```
-DashboardContext.jobs → JobsTable
-DashboardContext.batches → BatchesTable
-DashboardContext.oshScans → OshScansTable
-DashboardContext.summary → SummaryCards
-DashboardContext.jobActivity → JobActivityGraph
-```
+| State Property | Component |
+|----------------|-----------|
+| `jobs` | JobsTable |
+| `batches` | BatchesTable |
+| `oshScans` | OshScansTable |
+| `summary` | SummaryCards |
+| `jobActivity` | JobActivityGraph |
 
 ## State Management
 
@@ -87,17 +116,19 @@ The dashboard handles these message types:
 | `osh_scan_failed` | OSH scan failed | Log warning |
 | `summary_update` | Summary metrics updated | Update summary cards |
 
-## Technology Stack
+## Component Relationships
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| React | 18.3.1 | UI framework |
-| TypeScript | 4.9.5 | Type safety |
-| PatternFly React Core | 5.4.14 | UI components |
-| PatternFly React Table | 5.4.16 | Data tables |
-| PatternFly React Icons | 5.4.2 | Icons |
-| PatternFly CSS | 5.4.2 | Styling |
-| Recharts | 2.12.7 | Charting library |
-| React Router DOM | 6.30.1 | Client-side routing |
-| Axios | 1.13.0 | HTTP client |
-| React Scripts | 5.0.1 | Build tooling |
+```
+App
+└── AppLayout
+    ├── SidebarNavigation
+    └── Routes
+        ├── Dashboard (/)
+        │   ├── SummaryCards
+        │   ├── JobActivityGraph
+        │   ├── JobsTable
+        │   ├── BatchesTable
+        │   └── OshScansTable
+        └── MonitoredPackages (/packages)
+            └── MonitoredPackagesTable
+```

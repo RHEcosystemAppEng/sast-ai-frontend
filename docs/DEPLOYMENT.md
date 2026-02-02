@@ -28,7 +28,17 @@ docker run -p 8080:8080 sast-ai-frontend:latest
 
 ## OpenShift/Kubernetes Deployment
 
-### Using Makefile (Recommended)
+### 1. Create Namespace (if needed)
+
+```bash
+# OpenShift
+oc new-project sast-ai-dev
+
+# Kubernetes
+kubectl create namespace sast-ai-dev
+```
+
+### 2. Deploy with Makefile (Recommended)
 
 ```bash
 cd deploy
@@ -42,7 +52,7 @@ make rollback    # Rollback to previous version
 make clean       # Remove deployment
 ```
 
-### Using Helm Directly
+### 3. Deploy with Helm Directly
 
 ```bash
 cd deploy/frontend-chart
@@ -55,6 +65,19 @@ helm upgrade sast-ai-frontend . -n sast-ai-dev
 
 # Uninstall
 helm uninstall sast-ai-frontend -n sast-ai-dev
+```
+
+### 4. Verify Deployment
+
+```bash
+# Check pods are running
+oc get pods -n sast-ai-dev -l app=sast-ai-frontend
+
+# Check route/ingress
+oc get route -n sast-ai-dev
+
+# Test health endpoint
+curl $(oc get route sast-ai-frontend -n sast-ai-dev -o jsonpath='{.spec.host}')/healthz
 ```
 
 ## Runtime Configuration
@@ -98,7 +121,6 @@ The deployment includes Kubernetes health probes:
 ## Testing a Specific Commit
 
 ```bash
-# Override image tag temporarily
 helm upgrade sast-ai-frontend deploy/frontend-chart \
   -n sast-ai-dev \
   --set app.image.tag=main-abc1234
@@ -111,8 +133,47 @@ helm upgrade sast-ai-frontend deploy/frontend-chart \
 make rollback
 
 # Using Helm directly
-helm upgrade sast-ai-frontend-prod deploy/frontend-chart \
-  -n sast-ai-prod \
-  -f deploy/frontend-chart/values-prod.yaml \
-  --set app.image.tag=v1.0.0
+helm rollback sast-ai-frontend -n sast-ai-dev
+```
+
+## Troubleshooting
+
+### Pod not starting
+
+```bash
+# Check pod status and events
+oc describe pod -l app=sast-ai-frontend -n sast-ai-dev
+
+# Check logs
+oc logs -l app=sast-ai-frontend -n sast-ai-dev
+```
+
+**Common issues:**
+- **ImagePullBackOff**: Check registry credentials and image name
+- **CrashLoopBackOff**: Check logs for nginx config errors
+- **Pending**: Check resource quotas and node availability
+
+### WebSocket not connecting
+
+1. Verify the route supports WebSocket (check annotations)
+2. Ensure `REACT_APP_WS_URL` uses `wss://` for HTTPS routes
+3. Check browser console for connection errors
+4. Verify orchestrator WebSocket endpoint is accessible
+
+### Blank page / 404 errors
+
+1. Check nginx is serving the build files: `oc exec <pod> -- ls /usr/share/nginx/html`
+2. Verify ConfigMap is mounted: `oc exec <pod> -- cat /usr/share/nginx/html/env-config.js`
+3. Check browser console for JavaScript errors
+
+### Configuration not updating
+
+After changing `values.yaml`:
+
+```bash
+# Upgrade to apply new ConfigMap
+make upgrade
+
+# Force pod restart to pick up changes
+oc rollout restart deployment/sast-ai-frontend -n sast-ai-dev
 ```
