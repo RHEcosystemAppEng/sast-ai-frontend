@@ -6,83 +6,103 @@
 
 Real-time monitoring dashboard for [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator) with WebSocket updates.
 
-## Prerequisites
+## Table of Contents
 
-### For Local Development
-- **Node.js 18+** and npm
-- **SAST AI Orchestrator** running (default: http://localhost:8080)
+- [Quick Start](#quick-start)
+- [Screenshots](#screenshots)
+- [Development](#development)
+- [Configuration](#configuration)
+- [Deployment](#deployment)
+- [Architecture](#architecture)
+- [Release Management](#release-management)
+- [Technology Stack](#technology-stack)
+- [Links](#links)
 
-### For Deployment
-- **Podman/Docker** (for containerized deployment)
-- **Helm 3** (for Kubernetes/OpenShift deployment)
-- **oc** or **kubectl** CLI (for cluster access)
-- Access to container registry (Quay.io for CI/CD)
-
-## Screenshots
-
-### Dashboard Overview
-![Dashboard Overview](docs/screenshots/dashboard-overview.png)
-
-The dashboard provides a comprehensive view with:
-- **Summary Cards**: Real-time statistics for Jobs, Batches, and OSH Scans
-- **Job Activity Graph**: 24-hour timeline showing job status trends (Running, Pending, Completed, Failed)
-
-### Jobs Table
-![Jobs Table](docs/screenshots/jobs-table-view.png)
-
-The Jobs view features:
-- **Filterable table** with job details (ID, package, status, timestamps)
-- **Status indicators** with color-coding (Running, Completed, Failed, etc.)
-- **Actions column** with links to Tekton pipelines
-- **Pagination** for large datasets
-
-### OSH Scans Table
-![OSH Scans Table](docs/screenshots/osh-scans-table.png)
-
-The OSH Scans view displays:
-- **Scan details** including hash IDs, accounts, etc.
-- **Status tracking** (Collected/Uncollected)
-- **Processing timestamps**
+---
 
 ## Quick Start
 
+**Prerequisites:** Node.js 18+ and npm
+
 ```bash
-# Install dependencies
+# Clone and install
 npm install
 
-# Create environment configuration (local/OCP endpoints)
-cat > .env << 'EOF'
-REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
-REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
-EOF
+# Configure environment
+cp .env.example .env
+# Edit .env with your orchestrator URLs
 
 # Start development server
 npm start
-
-# Open browser at http://localhost:3000
+# Open http://localhost:3000
 ```
 
-## Configuration
-
-The application supports a **two-tier configuration strategy** to enable runtime configuration in containerized environments:
-
-### 1. Build-time Configuration (Local Development)
-
-Create a `.env` file in the project root:
+<details>
+<summary><strong>Environment Variables</strong></summary>
 
 ```bash
-# Orchestrator REST API URL
+# .env file
 REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
-
-# Orchestrator WebSocket URL
 REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
 ```
 
-These values are embedded into the JavaScript bundle during `npm build`.
+</details>
 
-### 2. Runtime Configuration (Kubernetes/OpenShift)
+---
 
-In production, configuration is provided via a **Kubernetes ConfigMap** that generates `/env-config.js`:
+## Screenshots
+
+| Dashboard Overview | Jobs Table |
+|:------------------:|:----------:|
+| ![Dashboard](docs/screenshots/dashboard-overview.png) | ![Jobs](docs/screenshots/jobs-table-view.png) |
+
+| OSH Scans Table |
+|:---------------:|
+| ![OSH Scans](docs/screenshots/osh-scans-table.png) |
+
+**Key Features:**
+- **Summary Cards** — Real-time statistics for Jobs, Batches, and OSH Scans
+- **Job Activity Graph** — 24-hour timeline showing job status trends
+- **Filterable Tables** — Jobs, Batches, and OSH Scans with pagination
+- **Live Updates** — WebSocket-powered real-time data sync
+
+---
+
+## Development
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start dev server with hot reload |
+| `npm test` | Run tests |
+| `npm test -- --coverage` | Run tests with coverage |
+| `npm run build` | Create production build |
+
+### Development Server
+
+- **URL:** http://localhost:3000
+- **Hot reload:** Enabled
+- **WebSocket:** View messages in DevTools Console
+
+---
+
+## Configuration
+
+The application uses a **two-tier configuration** approach:
+
+### Local Development (Build-time)
+
+Create a `.env` file:
+
+```bash
+REACT_APP_ORCHESTRATOR_API_URL=http://localhost:8080/api/v1
+REACT_APP_WS_URL=ws://localhost:8080/ws/dashboard
+```
+
+### Kubernetes/OpenShift (Runtime)
+
+Configuration via ConfigMap generates `/env-config.js`:
 
 ```javascript
 window._env_ = {
@@ -91,13 +111,8 @@ window._env_ = {
 };
 ```
 
-**Benefits:**
-- Same Docker image works across all environments
-- No rebuild required for configuration changes
-- Update ConfigMap → Helm upgrade → Pods auto-restart
+Edit values in `deploy/frontend-chart/values.yaml`:
 
-**Configuration in Helm:**
-Edit `deploy/frontend-chart/values.yaml`:
 ```yaml
 app:
   env:
@@ -105,321 +120,164 @@ app:
     REACT_APP_WS_URL: "wss://your-orchestrator-url/ws/dashboard"
 ```
 
-## Development
-
-```bash
-# Start development server (hot reload enabled)
-npm start
-
-# Run tests
-npm test
-
-# Run tests with coverage
-npm test -- --coverage
-
-# Build for production
-npm run build
-```
-
-### Development Server
-
-- Opens at: **http://localhost:3000**
-- Connects to orchestrator at: **http://localhost:8080** (configurable via `.env`)
-- Hot reload enabled (changes reflect immediately)
-- DevTools console shows WebSocket messages
+---
 
 ## Deployment
 
-### Container Build & Run
-
-#### Build Container Image
-
-The project includes a multi-stage Containerfile using Red Hat UBI images:
+### Container Build
 
 ```bash
-# Build the image
+# Build image
 docker build -t sast-ai-frontend:latest .
 
 # Run locally
 docker run -p 8080:8080 sast-ai-frontend:latest
-
-# Access at http://localhost:8080
 ```
 
-**Container Image Details:**
-- Base: Red Hat UBI 9 with Nginx
-- Non-root user (UID 1001) for OpenShift compatibility
-- Port: 8080
-- Health check: `/healthz`
+**Container Details:** Red Hat UBI 9 + Nginx | Non-root (UID 1001) | Port 8080 | Health: `/healthz`
 
-#### Automated CI/CD
+### OpenShift/Kubernetes
 
-Pushes to `main` branch trigger GitHub Actions:
-1. Build Docker image using Buildx
-2. Push to `quay.io/ecosystem-appeng/sast-ai-frontend:latest`
-3. Deploy manually using Helm
-
-### OpenShift/Kubernetes Deployment
-
-#### Using Makefile (Recommended)
+<details>
+<summary><strong>Using Makefile (Recommended)</strong></summary>
 
 ```bash
 cd deploy
 
-# First-time deployment
-make deploy
-
-# Upgrade existing deployment
-make upgrade
-
-# Check deployment status
-make status
-
-# Get frontend URL
-make url
-
-# View pod logs
-make logs
-
-# Rollback to previous version
-make rollback
-
-# Remove deployment
-make clean
+make deploy      # First-time deployment
+make upgrade     # Upgrade existing
+make status      # Check status
+make url         # Get frontend URL
+make logs        # View pod logs
+make rollback    # Rollback to previous
+make clean       # Remove deployment
 ```
 
-#### Using Helm Directly
+</details>
+
+<details>
+<summary><strong>Using Helm Directly</strong></summary>
 
 ```bash
 cd deploy/frontend-chart
 
-# Install
 helm install sast-ai-frontend . -n sast-ai-dev
-
-# Upgrade
 helm upgrade sast-ai-frontend . -n sast-ai-dev
-
-# Uninstall
 helm uninstall sast-ai-frontend -n sast-ai-dev
 ```
 
-#### Health Checks
+</details>
 
-The deployment includes Kubernetes health probes:
+<details>
+<summary><strong>Health Checks & Route Features</strong></summary>
 
-- **Liveness Probe**: `GET /healthz` every 10s (starts after 10s)
-- **Readiness Probe**: `GET /healthz` every 5s (starts after 5s)
+**Health Probes:**
+- Liveness: `GET /healthz` every 10s
+- Readiness: `GET /healthz` every 5s
 
-#### OpenShift Route Features
+**OpenShift Route:**
+- TLS: Automatic edge termination
+- WebSocket: Supported (1-hour timeout)
 
-- **TLS**: Automatic edge termination (HTTPS)
-- **WebSocket**: Supported with 1-hour timeout
-- **Hostname**: Auto-generated based on cluster domain
+</details>
 
-### Build for Production
-
-```bash
-# Create optimized production build
-npm run build
-
-# Output directory: build/
-# Contains static HTML, CSS, JS files ready for deployment
-```
-
-**Build artifacts are automatically included in Docker image.**
-
-## Testing WebSocket Connection
-
-Open browser DevTools Console to see WebSocket messages:
-
-```
-WebSocket connected
-WebSocket message: { type: 'job_status_change', data: {...} }
-```
+---
 
 ## Architecture
 
-The dashboard follows a centralized state management pattern with real-time updates:
-
-**1. Initial Load (REST API):**
 ```
-DashboardContext → orchestratorApi.getJobs() → Update state
-DashboardContext → orchestratorApi.getBatches() → Update state
-DashboardContext → orchestratorApi.getOshScans() → Update state
-DashboardContext → orchestratorApi.getDashboardSummary() → Update state
-DashboardContext → orchestratorApi.getJobActivity24h() → Update state
-```
-
-**Additional API Methods Available:**
-- `getJobById(jobId)` - Fetch individual job details
-- `getBatchById(batchId)` - Fetch individual batch details
-- `getOshStatus()` - Fetch OSH status
-- `getHealth()` - Health check endpoint
-
-**2. Real-time Updates (WebSocket):**
-```
-Orchestrator → ws://dashboard → DashboardContext → Update state → Components re-render
+┌─────────────────────────────────────────────────────────────┐
+│                     Dashboard Context                        │
+├─────────────────────────────────────────────────────────────┤
+│  Initial Load (REST)          Real-time Updates (WebSocket) │
+│  ─────────────────            ─────────────────────────────  │
+│  orchestratorApi.get*()  ←→   Orchestrator /ws/dashboard    │
+├─────────────────────────────────────────────────────────────┤
+│  State: jobs | batches | oshScans | summary | jobActivity   │
+├─────────────────────────────────────────────────────────────┤
+│  Components: JobsTable | BatchesTable | OshScansTable | ... │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-WebSocket includes automatic reconnection with exponential backoff (max 10 attempts) and ping/pong keepalive every 30 seconds.
+<details>
+<summary><strong>WebSocket Message Types</strong></summary>
 
-**3. State Management:**
+| Message Type | Description |
+|--------------|-------------|
+| `connected` | Connection confirmed |
+| `pong` | Keepalive response |
+| `job_status_change` | Job status updated |
+| `batch_progress` | Batch progress updated |
+| `osh_scan_collected` | OSH scan converted to job |
+| `summary_update` | Summary metrics updated |
 
-DashboardContext provides:
-- `jobs` - Array of job objects
-- `batches` - Array of batch objects
-- `oshScans` - Array of OSH scan objects
-- `summary` - Dashboard summary metrics
-- `jobActivity` - 24-hour job activity statistics
-- `loading` - Loading state indicator
-- `error` - Error state
-- `refetchAll()` - Manual data refresh method
+WebSocket features automatic reconnection (exponential backoff, max 10 attempts) and ping/pong keepalive every 30s.
 
-**4. State to UI:**
+</details>
+
+<details>
+<summary><strong>State Management</strong></summary>
+
+`DashboardContext` provides:
+- `jobs`, `batches`, `oshScans` — Data arrays
+- `summary`, `jobActivity` — Metrics
+- `loading`, `error` — Status indicators
+- `refetchAll()` — Manual refresh
+
+</details>
+
+---
+
+## Release Management
+
+### Development (Automatic)
+
+Push to `main` → GitHub Actions builds → Images pushed to Quay.io → ArgoCD auto-syncs
+
 ```
-DashboardContext.jobs → JobsTable
-DashboardContext.batches → BatchesTable
-DashboardContext.oshScans → OshScansTable
-DashboardContext.summary → SummaryCards
-DashboardContext.jobActivity → JobActivityGraph (24-hour activity chart)
+Tags: latest, main-{sha}
 ```
 
-### WebSocket Messages
+### Production (Manual)
 
-The dashboard handles these message types:
+1. **Create release:**
+   ```bash
+   git tag v1.0.1 && git push origin v1.0.1
+   gh release create v1.0.1 --title "Release v1.0.1"
+   ```
 
-| Message Type | Description | Action |
-|--------------|-------------|--------|
-| `connected` | Confirmation of WS connection | Log to console |
-| `pong` | Keepalive response | Reset connection timer |
-| `job_status_change` | Job status updated | Update job in table |
-| `batch_progress` | Batch progress updated | Update batch progress bar |
-| `osh_scan_collected` | OSH scan converted to job | Add new job to table |
-| `osh_scan_failed` | OSH scan failed | Log warning |
-| `summary_update` | Summary metrics updated | Update summary cards |
+2. **Workflow updates:** `package.json`, `Chart.yaml`, `values-prod.yaml`
+
+3. **Deploy:** Manually sync in [ArgoCD Dashboard](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com)
+
+<details>
+<summary><strong>Image Tag Strategy</strong></summary>
+
+| Environment | Tag | Update Method |
+|-------------|-----|---------------|
+| Development | `latest` | Automatic (ArgoCD auto-sync) |
+| Production | `v1.0.x` | Manual (ArgoCD manual sync) |
+| Testing | `main-{sha}` | Manual (Helm override) |
+
+</details>
+
+---
 
 ## Technology Stack
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| **React** | 18.3.1 | UI framework |
-| **TypeScript** | 4.9.5 | Type safety |
-| **PatternFly React Core** | 5.4.14 | UI components |
-| **PatternFly React Table** | 5.4.16 | Data tables |
-| **PatternFly React Icons** | 5.4.2 | Icons |
-| **PatternFly CSS** | 5.4.2 | Styling |
-| **Recharts** | 2.12.7 | Charting library for activity graphs |
-| **React Router DOM** | 6.30.1 | Client-side routing |
-| **Axios** | 1.13.0 | HTTP client |
-| **React Scripts** | 5.0.1 | Build tooling |
+| React | 18.3.1 | UI framework |
+| TypeScript | 4.9.5 | Type safety |
+| PatternFly | 5.4.x | UI components & styling |
+| Recharts | 2.12.7 | Activity graphs |
+| React Router | 6.30.1 | Client-side routing |
+| Axios | 1.13.0 | HTTP client |
 
-## Manual Testing
-
-1. **Start orchestrator**:
-   ```bash
-   cd ../sast-ai-orchestrator
-   ./mvnw quarkus:dev
-   ```
-
-2. **Start dashboard**:
-   ```bash
-   npm start
-   ```
-
-3. **Verify UI Components** (see [Screenshots](#screenshots) section for visual reference):
-   - Dashboard loads at http://localhost:3000
-   - Connection indicator shows "Live" (green)
-   - Summary cards display metrics ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
-   - Jobs table shows data ([Jobs Table](docs/screenshots/jobs-table-view.png))
-   - Batches table shows data
-   - OSH Scans tab displays scan data ([OSH Scans Table](docs/screenshots/osh-scans-table.png))
-   - Job Activity Graph shows 24-hour activity chart ([Dashboard Overview](docs/screenshots/dashboard-overview.png))
-
-4. **Test WebSocket**:
-   - Open DevTools Console
-   - Look for: `WebSocket connected`
-   - Trigger job status change in orchestrator
-   - Watch tables update in real-time
-
-## Release Management
-
-### Development Workflow
-
-**Automatic deployment on every push to main:**
-
-1. Developer pushes commit to `main` branch
-2. `build-dev-image.yml` workflow triggers automatically
-3. Two image tags are created:
-   - `latest` - Always points to the latest main branch build
-   - `main-{sha}` - Immutable commit-specific tag (e.g., `main-abc1234`)
-4. ArgoCD detects changes and auto-syncs to `sast-ai-dev` namespace using `latest` tag
-
-**Image tags created:**
-```
-quay.io/ecosystem-appeng/sast-ai-frontend:latest
-quay.io/ecosystem-appeng/sast-ai-frontend:main-abc1234
-```
-
-### Production Workflow
-
-**Manual release process for production deployments:**
-
-1. **Create a GitHub Release:**
-   ```bash
-   # Tag the release (e.g., v1.0.1)
-   git tag v1.0.1
-   git push origin v1.0.1
-
-   # Then create a release in GitHub UI or via gh CLI:
-   gh release create v1.0.1 --title "Release v1.0.1" --notes "Description of changes"
-   ```
-
-2. **Automated workflow execution:**
-   - `build-release-image.yml` triggers on release publication
-   - Builds and pushes images with tags: `latest` and `v1.0.1`
-   - Automatically updates version files:
-     - `package.json` → `"version": "1.0.1"`
-     - `deploy/frontend-chart/values-prod.yaml` → `tag: "v1.0.1"`
-     - `deploy/frontend-chart/Chart.yaml` → `version: 1.0.1`
-   - Commits changes back to main with message: `chore: Update version to v1.0.1 [skip ci]`
-
-3. **Manual ArgoCD sync:**
-   - Navigate to [ArgoCD Dashboard](https://sast-ai-argocd-server-sast-ai-prod.apps.appeng.clusters.se-apps.redhat.com)
-   - Find `sast-ai-frontend-prod` application (will show "OutOfSync")
-   - Click **SYNC** to deploy to production
-
-**Image tags created:**
-```
-quay.io/ecosystem-appeng/sast-ai-frontend:latest
-quay.io/ecosystem-appeng/sast-ai-frontend:v1.0.1
-```
-
-**Testing a specific commit:**
-```bash
-# Override image tag in values-dev.yaml temporarily
-helm upgrade sast-ai-frontend deploy/frontend-chart \
-  -n sast-ai-dev \
-  --set app.image.tag=main-abc1234
-```
-
-**Rolling back production to a previous version:**
-```bash
-# Manually edit values-prod.yaml or use --set
-helm upgrade sast-ai-frontend-prod deploy/frontend-chart \
-  -n sast-ai-prod \
-  -f deploy/frontend-chart/values-prod.yaml \
-  --set app.image.tag=v1.0.0
-```
-
-### Image Tag Strategy Summary
-
-| Environment | Tag Used | Update Method | Approval Required |
-|-------------|----------|---------------|-------------------|
-| **Development** | `latest` | Automatic (ArgoCD auto-sync) | No |
-| **Production** | `v1.0.x` | Manual (ArgoCD manual sync) | Yes |
-| **Testing/Rollback** | `main-{sha}` or `v1.0.x` | Manual (Helm override) | N/A |
+---
 
 ## Links
 
-- [PatternFly React Documentation](https://www.patternfly.org/components/all-components)
-- [WebSocket API Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
+- [PatternFly Documentation](https://www.patternfly.org/components/all-components)
+- [SAST AI Orchestrator](https://github.com/RHEcosystemAppEng/sast-ai-orchestrator)
+- [Container Registry (Quay.io)](https://quay.io/repository/ecosystem-appeng/sast-ai-frontend)
